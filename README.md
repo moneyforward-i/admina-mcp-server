@@ -1,0 +1,1 @@
+# admina-mcp-server
