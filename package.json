@@ -1,0 +1,27 @@
+{
+  "type": "module",
+  "bin": {
+    "my-mcp-server": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc && chmod 755 build/index.js",
+    "build:dev": "tsc -w",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "inspector": "source .env && npx @modelcontextprotocol/inspector build/index.js -e ADMINA_API_KEY=$ADMINA_API_KEY -e ADMINA_ORGANIZATION_ID=$ADMINA_ORGANIZATION_ID"
+  },
+  "files": [
+    "build"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.1",
+    "axios": "^1.8.4",
+    "zod": "^3.24.3",
+    "zod-to-json-schema": "^3.24.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.14.1",
+    "typescript": "^5.8.3"
+  }
+}
