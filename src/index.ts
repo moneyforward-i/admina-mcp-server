@@ -36,22 +36,22 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "get_devices",
         description:
-          "Return a list of devices with localized values filterable by status, asset number, serial number, and uid (or peopleId)",
+          "Return a list of devices. Can be filtered by the status, asset number, serial number, or identityId which can be obtained from the get_identities tool.",
         inputSchema: zodToJsonSchema(DeviceFiltersSchema),
       },
       {
         name: "get_identities",
-        description: "Return a list of identities with localized values",
+        description: "Return a list of identities. Can be filtered by the status, department and type. Can also search by the email or name by keyword",
         inputSchema: zodToJsonSchema(IdentityFiltersSchema),
       },
       {
         name: "get_services",
-        description: "Return a list of services with optional filters",
+        description: "Return a list of services, along with the preview of the accounts. Can be searched by the service name by keyword",
         inputSchema: zodToJsonSchema(ServiceFiltersSchema),
       },
       {
         name: "get_service_accounts",
-        description: "Return a list of service accounts with optional filters",
+        description: "Return a list of accounts for a specific service. The serviceId can be obtained from the get_services tool. Can be searched by email/name of the account by keyword",
         inputSchema: zodToJsonSchema(ServiceAccountFiltersSchema),
       },
     ],
