@@ -41,17 +41,20 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "get_identities",
-        description: "Return a list of identities. Can be filtered by the status, department and type. Can also search by the email or name by keyword",
+        description:
+          "Return a list of identities. Can be filtered by the status, department and type. Can also search by the email or name by keyword",
         inputSchema: zodToJsonSchema(IdentityFiltersSchema),
       },
       {
         name: "get_services",
-        description: "Return a list of services, along with the preview of the accounts. Can be searched by the service name by keyword",
+        description:
+          "Return a list of services, along with the preview of the accounts. Can be searched by the service name by keyword",
         inputSchema: zodToJsonSchema(ServiceFiltersSchema),
       },
       {
         name: "get_service_accounts",
-        description: "Return a list of accounts for a specific service. The serviceId can be obtained from the get_services tool. Can be searched by email/name of the account by keyword",
+        description:
+          "Return a list of accounts for a specific service. The serviceId can be obtained from the get_services tool. Can be searched by email/name of the account by keyword",
         inputSchema: zodToJsonSchema(ServiceAccountFiltersSchema),
       },
     ],
