@@ -1,17 +1,17 @@
 import {
+  AdminaAuthenticationError,
   AdminaError,
   AdminaInvalidRequestError,
-  AdminaAuthenticationError,
+  AdminaNotFoundError,
   AdminaPermissionError,
   AdminaRequestTimeoutError,
-  AdminaValidationError,
   AdminaSystemError,
-  AdminaTimeoutError,
   AdminaTeapotError,
-  AdminaNotFoundError,
-  isAdminaError,
-  formatAdminaError,
+  AdminaTimeoutError,
+  AdminaValidationError,
   createAdminaError,
+  formatAdminaError,
+  isAdminaError,
 } from "../../common/errors.js";
 
 describe("Admina Error Classes", () => {

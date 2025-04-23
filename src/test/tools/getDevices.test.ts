@@ -1,7 +1,7 @@
-import { getDevices, DeviceFilters } from "../../tools/getDevices.js";
-import { AdminaApiClient, getClient, resetClient } from "../../admina-api.js";
-import axios from "axios";
 import { URLSearchParams } from "node:url";
+import axios from "axios";
+import { AdminaApiClient, getClient, resetClient } from "../../admina-api.js";
+import { DeviceFilters, getDevices } from "../../tools/getDevices.js";
 
 // Define the shape of our mock response
 interface MockApiResponse {

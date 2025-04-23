@@ -1,7 +1,7 @@
-import { getIdentities, IdentityFilters } from "../../tools/getIdentities.js";
-import { resetClient } from "../../admina-api.js";
-import axios from "axios";
 import { URLSearchParams } from "node:url";
+import axios from "axios";
+import { resetClient } from "../../admina-api.js";
+import { IdentityFilters, getIdentities } from "../../tools/getIdentities.js";
 
 // Define the shape of our mock response
 interface MockApiResponse {
