@@ -3,20 +3,17 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import { AdminaApiClient } from "./admina-api.js";
-import { formatAdminaError, isAdminaError } from "./errors.js";
+import { formatAdminaError, isAdminaError } from "./common/errors.js";
 import {
   DeviceFiltersSchema,
+  getDevices,
+  getIdentities,
+  getServiceAccounts,
+  getServices,
   IdentityFiltersSchema,
   ServiceAccountFiltersSchema,
   ServiceFiltersSchema,
-} from "./schemas/index.js";
-
-if (!process.env.ADMINA_API_KEY || !process.env.ADMINA_ORGANIZATION_ID) {
-  throw new Error("ADMINA_API_KEY and ADMINA_ORGANIZATION_ID must be set");
-}
-
-const adminaApi = new AdminaApiClient(process.env.ADMINA_API_KEY, process.env.ADMINA_ORGANIZATION_ID);
+} from "./tools/index.js";
 
 const server = new Server(
   {
@@ -67,7 +64,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     if (toolName === "get_devices") {
       const args = DeviceFiltersSchema.parse(input);
-      const response = await adminaApi.getDevices(args);
+      const response = await getDevices(args);
       return {
         content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
         isError: false,
@@ -76,7 +73,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     if (toolName === "get_identities") {
       const args = IdentityFiltersSchema.parse(input);
-      const response = await adminaApi.getIdentities(args);
+      const response = await getIdentities(args);
       return {
         content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
         isError: false,
@@ -85,7 +82,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     if (toolName === "get_services") {
       const args = ServiceFiltersSchema.parse(input);
-      const response = await adminaApi.getServices(args);
+      const response = await getServices(args);
       return {
         content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
         isError: false,
@@ -94,7 +91,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     if (toolName === "get_service_accounts") {
       const args = ServiceAccountFiltersSchema.parse(input);
-      const response = await adminaApi.getServiceAccounts(args);
+      const response = await getServiceAccounts(args);
       return {
         content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
         isError: false,

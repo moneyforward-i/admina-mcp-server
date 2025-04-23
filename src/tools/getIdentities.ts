@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { getClient } from "../admina-api.js";
+import { filtersToParams } from "../common/helper.js";
 
 export const IdentityFiltersSchema = z.object({
   limit: z.number().optional(),
@@ -13,3 +15,9 @@ export const IdentityFiltersSchema = z.object({
 });
 
 export type IdentityFilters = z.infer<typeof IdentityFiltersSchema>;
+
+export async function getIdentities(filters: IdentityFilters) {
+  const client = getClient();
+  const queryParams = filtersToParams(filters);
+  return client.makeApiCall("/identity", queryParams);
+}

@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { filtersToParams } from "../common/helper.js";
+import { getClient } from "../admina-api.js";
 
 export const ServiceAccountFiltersSchema = z.object({
   serviceId: z.number(),
@@ -55,3 +57,11 @@ export const ServiceAccountFiltersSchema = z.object({
 });
 
 export type ServiceAccountFilters = z.infer<typeof ServiceAccountFiltersSchema>;
+
+export async function getServiceAccounts(filters: ServiceAccountFilters) {
+  const client = getClient();
+  const { serviceId, ...rest } = filters;
+  const queryParams = filtersToParams(rest);
+
+  return client.makeApiCall(`/services/${serviceId}/accounts`, queryParams);
+}

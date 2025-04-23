@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { getClient } from "../admina-api.js";
+import { filtersToParams } from "../common/helper.js";
 
 export const DeviceFiltersSchema = z.object({
   status: z.enum(["in_stock", "pre_use", "active", "missing", "malfunction", "decommissioned"]).optional(),
@@ -13,3 +15,9 @@ export const DeviceFiltersSchema = z.object({
 });
 
 export type DeviceFilters = z.infer<typeof DeviceFiltersSchema>;
+
+export async function getDevices(filters: DeviceFilters) {
+  const client = getClient();
+  const queryParams = filtersToParams(filters);
+  return client.makeApiCall("/devices", queryParams);
+}
