@@ -3,14 +3,14 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { AdminaApiClient } from "./admina-api.js";
+import { formatAdminaError, isAdminaError } from "./errors.js";
 import {
-  AdminaApiClient,
   DeviceFiltersSchema,
   IdentityFiltersSchema,
   ServiceAccountFiltersSchema,
   ServiceFiltersSchema,
-} from "./admina-api.js";
-import { formatAdminaError, isAdminaError } from "./errors.js";
+} from "./schemas/index.js";
 
 if (!process.env.ADMINA_API_KEY || !process.env.ADMINA_ORGANIZATION_ID) {
   throw new Error("ADMINA_API_KEY and ADMINA_ORGANIZATION_ID must be set");
