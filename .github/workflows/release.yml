@@ -16,6 +16,7 @@ jobs:
         with:
           node-version: "22.x"
           registry-url: "https://registry.npmjs.org"
+          scope: "@moneyforward_i"
 
       - name: Install dependencies
         run: yarn install
