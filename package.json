@@ -1,7 +1,15 @@
 {
+  "name": "@moneyforward_i/admina-mcp-server",
+  "version": "1.0.0",
+  "description": "An MCP server for Admina",
   "type": "module",
+  "keywords": [
+    "mcp",
+    "mcp-server"
+  ],
+  "main": "./build/index.js",
   "bin": {
-    "my-mcp-server": "./build/index.js"
+    "admina-mcp-server": "./build/index.js"
   },
   "scripts": {
     "build": "tsc && chmod 755 build/index.js",
