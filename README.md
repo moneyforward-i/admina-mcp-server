@@ -17,10 +17,11 @@ To configure this MCP server, add the following configuration to your mcp settin
 ```
 {
   "mcpServers": {
-    "admina-mpc": {
-      "command": "node",
+    "admina-mpc-server": {
+      "command": "npx",
       "args": [
-        "./build/index.js" // For local development. use npx after published
+        "-y",
+        "@moneyforward_i/admina-mcp-server"
       ],
       "env": {
         "ADMINA_ORGANIZATION_ID": <Organization Id>,
@@ -31,4 +32,4 @@ To configure this MCP server, add the following configuration to your mcp settin
 }
 ```
 
-For local set up, run `yarn build` or `yarn build:dev` and set the path to the build file.
+For local set up, run `yarn build:dev` and set the path to the root dir.
