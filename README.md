@@ -33,3 +33,23 @@ To configure this MCP server, add the following configuration to your mcp settin
 ```
 
 For local set up, run `yarn build:dev` and set the path to the root dir.
+
+## Releasing
+### Preparing a release
+
+- Bump up a package version of `package.json`. A Git commit will be created automatically.
+
+```
+yarn version --new-version <new version>
+```
+
+- Push the change to the main branch as usual.
+
+### Creating a release
+
+- Create a new release in GitHub by clicking on "Releases" and then "Draft a new release"
+- Set the Tag version to a new tag
+- Set the Target as main.
+- Set the Release title to the tag you created, vX.Y.Z
+- Click "Publish release" to save and publish your release.
+- GitHub Actions workflow will be triggerd by publishing a new release and the package will be released.
