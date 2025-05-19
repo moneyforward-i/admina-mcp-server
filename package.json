@@ -11,6 +11,10 @@
   "bin": {
     "admina-mcp-server": "./build/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moneyforward-i/admina-mcp-server.git"
+  },
   "scripts": {
     "build": "tsc",
     "build:dev": "tsc -w",
