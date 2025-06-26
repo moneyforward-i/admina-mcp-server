@@ -26,20 +26,42 @@ export class AdminaApiClient {
   // Generic method to make API calls
   public async makeApiCall<T>(
     endpoint: string,
-    queryParams: URLSearchParams,
+    queryParams: URLSearchParams | Record<string, string | number> = {},
+    method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
+    body?: any,
     config: AxiosRequestConfig = {},
   ): Promise<T> {
     try {
-      const url = `${this.ADMINA_API_BASE}/organizations/${this.organizationId}${endpoint}?${queryParams.toString()}`;
+      let url = `${this.ADMINA_API_BASE}/organizations/${this.organizationId}${endpoint}`;
+      
+      // Handle query parameters
+      if (queryParams instanceof URLSearchParams) {
+        if (queryParams.toString()) {
+          url += `?${queryParams.toString()}`;
+        }
+      } else if (Object.keys(queryParams).length > 0) {
+        const params = new URLSearchParams();
+        Object.entries(queryParams).forEach(([key, value]) => {
+          params.append(key, String(value));
+        });
+        url += `?${params.toString()}`;
+      }
 
-      const response = await axios.get(url, {
+      const requestConfig: AxiosRequestConfig = {
+        method,
+        url,
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
         },
         ...config,
-      });
+      };
 
+      if (body && (method === "POST" || method === "PUT")) {
+        requestConfig.data = body;
+      }
+
+      const response = await axios(requestConfig);
       return response.data as T;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
