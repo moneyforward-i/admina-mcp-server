@@ -39,5 +39,8 @@
     "jest": "^29.7.0",
     "ts-jest": "^29.3.2",
     "typescript": "^5.8.3"
+  },
+  "resolutions": {
+    "form-data": "^4.0.4"
   }
 }
