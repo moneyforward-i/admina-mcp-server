@@ -11,10 +11,14 @@ import {
   IdentityFiltersSchema,
   ServiceAccountFiltersSchema,
   ServiceFiltersSchema,
+  ProvisioningMetaFiltersSchema,
+  CreateServiceAccountSchema,
   getDevices,
   getIdentities,
   getServiceAccounts,
   getServices,
+  getProvisioningMeta,
+  createServiceAccount,
 } from "./tools/index.js";
 
 const server = new Server(
@@ -56,6 +60,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           "Return a list of accounts for a specific service. The serviceId can be obtained from the get_services tool. Can be searched by email/name of the account by keyword",
         inputSchema: zodToJsonSchema(ServiceAccountFiltersSchema),
       },
+      {
+        name: "get_provisioning_meta",
+        description:
+          "Step 1 of provisioning: Get provisioning metadata for a workspace. Returns required fields and constraints for creating service accounts. Use organizationId and workspaceId to specify the target workspace.",
+        inputSchema: zodToJsonSchema(ProvisioningMetaFiltersSchema),
+      },
+      {
+        name: "create_service_account",
+        description:
+          "Step 2 of provisioning: Create a service account in a workspace. First call get_provisioning_meta to get required fields, then use this tool with the constructed data object based on the metadata response.",
+        inputSchema: zodToJsonSchema(CreateServiceAccountSchema),
+      },
     ],
   };
 });
@@ -94,6 +110,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     if (toolName === "get_service_accounts") {
       const args = ServiceAccountFiltersSchema.parse(input);
       const response = await getServiceAccounts(args);
+      return {
+        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        isError: false,
+      };
+    }
+
+    if (toolName === "get_provisioning_meta") {
+      const args = ProvisioningMetaFiltersSchema.parse(input);
+      const response = await getProvisioningMeta(args);
+      return {
+        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        isError: false,
+      };
+    }
+
+    if (toolName === "create_service_account") {
+      const args = CreateServiceAccountSchema.parse(input);
+      const response = await createServiceAccount(args);
       return {
         content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
         isError: false,
