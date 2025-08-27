@@ -9,14 +9,14 @@ import { formatAdminaError, isAdminaError } from "./common/errors.js";
 import {
   DeviceFiltersSchema,
   IdentityFiltersSchema,
+  PeopleAccountsFiltersSchema,
   ServiceAccountFiltersSchema,
   ServiceFiltersSchema,
-  PeopleAccountsFiltersSchema,
   getDevices,
   getIdentities,
+  getPeopleAccounts,
   getServiceAccounts,
   getServices,
-  getPeopleAccounts,
 } from "./tools/index.js";
 
 const server = new Server(

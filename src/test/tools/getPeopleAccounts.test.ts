@@ -1,6 +1,6 @@
 import axios from "axios";
-import { getPeopleAccounts } from "../../tools/getPeopleAccounts.js";
 import { resetClient } from "../../admina-api.js";
+import { getPeopleAccounts } from "../../tools/getPeopleAccounts.js";
 
 // Mock axios to prevent real API calls
 jest.mock("axios");
@@ -100,14 +100,14 @@ describe("getPeopleAccounts", () => {
     expect(callUrl).toContain("workspaceIds=6");
     expect(callUrl).toContain("licenses=license1");
     expect(callUrl).toContain("licenses=license2");
-    
+
     // Test with correct sort values
     const filtersWithSort = {
       peopleId: 123,
       sortBy: "service" as const,
       sortOrder: "ASC" as const,
     };
-    
+
     await getPeopleAccounts(filtersWithSort);
     const sortCallUrl = mockedAxios.get.mock.calls[1][0];
     expect(sortCallUrl).toContain("sortBy=service");
