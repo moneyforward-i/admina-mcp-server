@@ -9,10 +9,12 @@ import { formatAdminaError, isAdminaError } from "./common/errors.js";
 import {
   DeviceFiltersSchema,
   IdentityFiltersSchema,
+  PeopleAccountsFiltersSchema,
   ServiceAccountFiltersSchema,
   ServiceFiltersSchema,
   getDevices,
   getIdentities,
+  getPeopleAccounts,
   getServiceAccounts,
   getServices,
 } from "./tools/index.js";
@@ -56,6 +58,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           "Return a list of accounts for a specific service. The serviceId can be obtained from the get_services tool. Can be searched by email/name of the account by keyword",
         inputSchema: zodToJsonSchema(ServiceAccountFiltersSchema),
       },
+      {
+        name: "get_people_accounts",
+        description:
+          "Return a list of SaaS accounts belonging to a person. The peopleId can be obtained from the get_identities tool. Can be filtered by role, two-factor authentication, and searched by service name or workspace name",
+        inputSchema: zodToJsonSchema(PeopleAccountsFiltersSchema),
+      },
     ],
   };
 });
@@ -94,6 +102,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     if (toolName === "get_service_accounts") {
       const args = ServiceAccountFiltersSchema.parse(input);
       const response = await getServiceAccounts(args);
+      return {
+        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        isError: false,
+      };
+    }
+
+    if (toolName === "get_people_accounts") {
+      const args = PeopleAccountsFiltersSchema.parse(input);
+      const response = await getPeopleAccounts(args);
       return {
         content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
         isError: false,

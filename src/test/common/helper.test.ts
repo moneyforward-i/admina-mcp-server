@@ -16,7 +16,7 @@ describe("filtersToParams", () => {
     expect(params.get("active")).toBe("true");
   });
 
-  it("should join array values with commas", () => {
+  it("should append array values as repeated parameters", () => {
     const filters = {
       tags: ["tag1", "tag2", "tag3"],
       ids: [1, 2, 3],
@@ -24,8 +24,9 @@ describe("filtersToParams", () => {
 
     const params = filtersToParams(filters);
 
-    expect(params.get("tags")).toBe("tag1,tag2,tag3");
-    expect(params.get("ids")).toBe("1,2,3");
+    // Check that each value is appended separately
+    expect(params.getAll("tags")).toEqual(["tag1", "tag2", "tag3"]);
+    expect(params.getAll("ids")).toEqual(["1", "2", "3"]);
   });
 
   it("should skip undefined and null values", () => {
