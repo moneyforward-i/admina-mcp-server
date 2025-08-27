@@ -1,0 +1,7 @@
+---
+alwaysApply: false
+---
+Use the Admina MCP to get data when this rule is mentioned.
+
+When asked to test, test the available tools with multiple arguments, and see if anything is wrong. Test each tools with at least 4 combinations of input using multiple args in one call.
+If you find some failing tools, generate a report of them.

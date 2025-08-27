@@ -1,4 +1,4 @@
 node_modules
 .env
-.cursor
+.cursor/mcp.json
 build/

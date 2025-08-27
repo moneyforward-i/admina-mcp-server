@@ -1,0 +1,168 @@
+---
+description: When adding new tools for the mcp server
+alwaysApply: false
+---
+# Adding New Tools to Admina MCP Server
+
+This guide outlines the process for adding new tools to the Admina MCP Server.
+
+## 1. Tool Identification
+
+Before implementing a new tool, you need to:
+
+1. Identify the target API endpoint from the [Admina API Documentation](https://api.itmc.i.moneyforward.com/public-api/docs/v1-json)
+2. Define:
+   - Tool name (should be descriptive and follow existing naming patterns)
+   - Tool description (clear, concise explanation of what the tool does)
+   - Required parameters and their types
+   - Expected response format
+
+Example:
+```typescript
+// Tool Definition Example
+{
+  name: "get_devices",
+  description: "Return a list of devices. Can be filtered by status, asset number...",
+  inputSchema: DeviceFiltersSchema
+}
+```
+
+## 2. API Configuration
+Understand the API configuration from the [Admina API Documentation](https://api.itmc.i.moneyforward.com/public-api/docs/v1-json). YOU MUST NEVER estimate the API configuration, 
+1. Review the API endpoint documentation:
+   - Check path parameters
+   - Query parameters
+   - Request/Response bodies
+   - Authentication requirements
+
+2. Create a schema for the tool's input parameters using Zod:
+```typescript
+// Example schema in tools/schemas.ts
+export const NewToolFiltersSchema = z.object({
+  param1: z.string(),
+  param2: z.number().optional(),
+  // ...
+});
+```
+
+## 3. Implementation
+
+1. Create a new file under `src/tools/` for your tool:
+```typescript
+// tools/newTool.ts
+import { NewToolFiltersSchema } from './schemas';
+
+export async function newTool(args: z.infer<typeof NewToolFiltersSchema>) {
+  // Implementation
+}
+```
+
+2. Register the tool in `src/tools/index.ts`:
+```typescript
+export { newTool } from './newTool';
+export { NewToolFiltersSchema } from './schemas';
+```
+
+3. Add the tool to the server configuration in `src/index.ts`:
+```typescript
+{
+  name: "new_tool",
+  description: "Description of what the tool does",
+  inputSchema: zodToJsonSchema(NewToolFiltersSchema),
+}
+```
+
+4. Add the tool handler in the CallToolRequestSchema handler:
+```typescript
+if (toolName === "new_tool") {
+  const args = NewToolFiltersSchema.parse(input);
+  const response = await newTool(args);
+  return {
+    content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+    isError: false,
+  };
+}
+```
+
+## 4. Testing
+
+1. Create test file under `src/test/tools/`:
+```typescript
+// test/tools/newTool.test.ts
+describe('newTool', () => {
+  test('should return expected response', async () => {
+    // Test implementation
+  });
+
+  test('should handle errors correctly', async () => {
+    // Error handling test
+  });
+});
+```
+
+2. Test different parameter combinations:
+   - Required parameters only
+   - All parameters
+   - Invalid parameters
+   - Edge cases
+
+## 5. Tool Testing with use-admina-mcp
+
+1. Use the `use-admina-mcp` rule to test the tool
+2. Test with multiple argument combinations
+3. Verify responses and error handling
+4. Generate a report of any failing tests
+
+## 6. Update README
+Add the tools and the corresponding API documentation to the `Tools and API Documentation` section
+
+## Best Practices
+
+1. **Naming Conventions**
+   - Use descriptive, lowercase names with underscores
+   - Follow existing patterns in the codebase
+   - Be consistent with parameter naming
+
+2. **Error Handling**
+   - Use appropriate error types
+   - Provide clear error messages
+   - Handle edge cases gracefully
+
+3. **Documentation**
+   - Keep descriptions clear and concise
+   - Document all parameters
+   - Include examples where helpful
+
+4. **Testing**
+   - Cover all main use cases
+   - Include error scenarios
+   - Test edge cases
+   - Use meaningful test descriptions
+
+## Example Implementation
+
+Here's a complete example of adding a new tool:
+
+```typescript
+// tools/schemas.ts
+export const ExampleToolSchema = z.object({
+  id: z.number(),
+  filter: z.string().optional()
+});
+
+// tools/exampleTool.ts
+import { ExampleToolSchema } from './schemas';
+
+export async function exampleTool(args: z.infer<typeof ExampleToolSchema>) {
+  // Implementation
+}
+
+// test/tools/exampleTool.test.ts
+describe('exampleTool', () => {
+  test('should return data for valid input', async () => {
+    // Test implementation
+  });
+});
+```
+
+Remember to update this documentation as new patterns or requirements emerge.
