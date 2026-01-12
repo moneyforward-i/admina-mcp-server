@@ -16,7 +16,7 @@ function getConfig(): { apiKey: string; organizationId: string } {
 export class AdminaApiClient {
   private readonly apiKey: string;
   private readonly organizationId: string;
-  private readonly ADMINA_API_BASE = "https://api.itmc.i.iggre.net/api/v1";
+  private readonly ADMINA_API_BASE = "https://api.itmc.i.moneyforward.com/api/v1";
 
   constructor(apiKey: string, organizationId: string) {
     this.apiKey = apiKey;
