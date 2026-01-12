@@ -58,7 +58,8 @@ export class AdminaApiClient {
   ): Promise<T> {
     try {
       const queryString = queryParams.toString();
-      const url = `${this.ADMINA_API_BASE}/organizations/${this.organizationId}${endpoint}${queryString ? `?${queryString}` : ""}`;
+      const querySuffix = queryString ? `?${queryString}` : "";
+      const url = `${this.ADMINA_API_BASE}/organizations/${this.organizationId}${endpoint}${querySuffix}`;
 
       const response = await axios.post(url, body, {
         headers: {

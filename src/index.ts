@@ -154,128 +154,42 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   };
 });
 
+// Tool handler type definition
+type ToolHandler = (input: Record<string, unknown>) => Promise<unknown>;
+
+// Tool handlers map to reduce cognitive complexity
+const toolHandlers: Record<string, ToolHandler> = {
+  get_organization_info: async () => getOrganizationInfo(),
+  get_devices: async (input) => getDevices(DeviceFiltersSchema.parse(input)),
+  create_device: async (input) => createDevice(CreateDeviceSchema.parse(input)),
+  update_device: async (input) => updateDevice(UpdateDeviceSchema.parse(input)),
+  update_device_meta: async (input) => updateDeviceMeta(UpdateDeviceMetaSchema.parse(input)),
+  get_device_custom_fields: async () => getDeviceCustomFields(),
+  create_device_custom_field: async (input) => createDeviceCustomField(CreateDeviceCustomFieldSchema.parse(input)),
+  update_device_custom_field: async (input) => updateDeviceCustomField(UpdateDeviceCustomFieldSchema.parse(input)),
+  delete_device_custom_field: async (input) => deleteDeviceCustomField(DeleteDeviceCustomFieldSchema.parse(input)),
+  get_identities: async (input) => getIdentities(IdentityFiltersSchema.parse(input)),
+  get_services: async (input) => getServices(ServiceFiltersSchema.parse(input)),
+  get_service_accounts: async (input) => getServiceAccounts(ServiceAccountFiltersSchema.parse(input)),
+  get_people_accounts: async (input) => getPeopleAccounts(PeopleAccountsFiltersSchema.parse(input)),
+};
+
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const toolName = request.params.name;
   const input = request.params.arguments || {};
   try {
-    if (toolName === "get_organization_info") {
-      const response = await getOrganizationInfo();
+    const handler = toolHandlers[toolName];
+    if (!handler) {
       return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
+        content: [{ type: "text", text: `Unknown tool: ${toolName}` }],
+        isError: true,
       };
     }
 
-    if (toolName === "get_devices") {
-      const args = DeviceFiltersSchema.parse(input);
-      const response = await getDevices(args);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
-    if (toolName === "create_device") {
-      const args = CreateDeviceSchema.parse(input);
-      const response = await createDevice(args);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
-    if (toolName === "update_device") {
-      const args = UpdateDeviceSchema.parse(input);
-      const response = await updateDevice(args);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
-    if (toolName === "update_device_meta") {
-      const args = UpdateDeviceMetaSchema.parse(input);
-      const response = await updateDeviceMeta(args);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
-    if (toolName === "get_device_custom_fields") {
-      const response = await getDeviceCustomFields();
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
-    if (toolName === "create_device_custom_field") {
-      const args = CreateDeviceCustomFieldSchema.parse(input);
-      const response = await createDeviceCustomField(args);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
-    if (toolName === "update_device_custom_field") {
-      const args = UpdateDeviceCustomFieldSchema.parse(input);
-      const response = await updateDeviceCustomField(args);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
-    if (toolName === "delete_device_custom_field") {
-      const args = DeleteDeviceCustomFieldSchema.parse(input);
-      const response = await deleteDeviceCustomField(args);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
-    if (toolName === "get_identities") {
-      const args = IdentityFiltersSchema.parse(input);
-      const response = await getIdentities(args);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
-    if (toolName === "get_services") {
-      const args = ServiceFiltersSchema.parse(input);
-      const response = await getServices(args);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
-    if (toolName === "get_service_accounts") {
-      const args = ServiceAccountFiltersSchema.parse(input);
-      const response = await getServiceAccounts(args);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
-    if (toolName === "get_people_accounts") {
-      const args = PeopleAccountsFiltersSchema.parse(input);
-      const response = await getPeopleAccounts(args);
-      return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-        isError: false,
-      };
-    }
-
+    const response = await handler(input);
     return {
-      content: [{ type: "text", text: `Unknown tool: ${toolName}` }],
-      isError: true,
+      content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+      isError: false,
     };
   } catch (error) {
     if (error instanceof z.ZodError) {
