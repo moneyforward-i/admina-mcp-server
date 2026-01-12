@@ -7,16 +7,32 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { formatAdminaError, isAdminaError } from "./common/errors.js";
 import {
+  CreateDeviceCustomFieldSchema,
+  CreateDeviceSchema,
+  DeleteDeviceCustomFieldSchema,
+  DeviceCustomFieldsSchema,
   DeviceFiltersSchema,
   IdentityFiltersSchema,
+  OrganizationInfoSchema,
   PeopleAccountsFiltersSchema,
   ServiceAccountFiltersSchema,
   ServiceFiltersSchema,
+  UpdateDeviceCustomFieldSchema,
+  UpdateDeviceMetaSchema,
+  UpdateDeviceSchema,
+  createDevice,
+  createDeviceCustomField,
+  deleteDeviceCustomField,
+  getDeviceCustomFields,
   getDevices,
   getIdentities,
+  getOrganizationInfo,
   getPeopleAccounts,
   getServiceAccounts,
   getServices,
+  updateDevice,
+  updateDeviceCustomField,
+  updateDeviceMeta,
 } from "./tools/index.js";
 
 const server = new Server(
@@ -35,10 +51,80 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: "get_devices",
+        name: "get_organization_info",
         description:
-          "Return a list of devices. Can be filtered by the status, asset number, serial number, or identityId which can be obtained from the get_identities tool.",
+          "Get information about the organization including name, unique name, status, system language, etc.",
+        inputSchema: zodToJsonSchema(OrganizationInfoSchema),
+      },
+      {
+        name: "get_devices",
+        description: `Get a list of devices for an organization using advanced search and filtering.
+
+## Key Features
+- Combine query parameters (pagination, sorting) with body parameters (filtering)
+- Support for text search, field-specific filters, and complex queries
+- Pagination with cursor-based navigation
+
+## Example Usage
+**Find first 5 devices for user with email "someone@gmail.com":**
+- Query: limit=5
+- Body: {"searchTerm": "someone@gmail.com", "searchFields": ["people.primaryEmail"]}
+
+## Pro Tips
+- **1**: Always make sure understand the definition of the fields (preset and custom fields) before using them.
+- **2**: If user search devices by category: pc, phone or other, please use body.type to filter devices by category.
+- **3**: Always to understand what are current sub types of the devices. If the user search information relate to sub types, Please use body.filters.["preset.subtype"] to filter devices by sub types.
+- **4**: We don't really need to use searchFields parameter to the search results in all fields, only use it when the user search information relate to specific fields.
+- **5**: If user want to filter devices by status, please use body.filters.["preset.status"].eq to filter devices by status.
+- **5.1**: Unassigned devices status should be "in_stock" or "decommissioned".
+- **6**: If user want to filter devices by preset fields or custom fields, please check the field.kind first, we only support date, number, dropdown kind of fields.
+- **6.1**: If the field.kind is date, please use body.filters.["preset.field_name"].minDate or body.filters.["custom.attributeCode"].minDate and body.filters.["preset.field_name"].maxDate or body.filters.["custom.attributeCode"].maxDate to filter devices by date range.
+- **6.2**: If the field.kind is number, please use body.filters.["preset.field_name"].minNumber or body.filters.["custom.attributeCode"].minNumber and body.filters.["preset.field_name"].maxNumber or body.filters.["custom.attributeCode"].maxNumber to filter devices by number range.
+- **6.3**: If the preset field field.kind is dropdown, please use body.filters.["preset.field_name"].eq or body.filters.["custom.attributeCode"].eq to filter devices by dropdown value.
+- **7**: Combine multiple filters examples: {"preset.status":{"eq":"active"},"preset.subtype":{"eq":"desktop_pc"},"custom.custom_xxx":{"eq":"1"},"custom.dt_13":{"minDate":"2025-12-23","maxDate":"2025-12-25"},"custom.drp_4":{"eq":"1"}}`,
         inputSchema: zodToJsonSchema(DeviceFiltersSchema),
+      },
+      {
+        name: "create_device",
+        description:
+          "Create a new device for an organization. Requires device type (subtype), asset number, and model name. Can include optional preset fields and custom fields.",
+        inputSchema: zodToJsonSchema(CreateDeviceSchema),
+      },
+      {
+        name: "update_device",
+        description:
+          "Update an existing device's information. Can update preset fields, custom fields, and device properties. Note: fields.preset.asset_number, fields.preset.subtype, fields.preset.model_name are always required.",
+        inputSchema: zodToJsonSchema(UpdateDeviceSchema),
+      },
+      {
+        name: "update_device_meta",
+        description:
+          "Update device's meta information including assignment info (peopleId, status, dates) and location. Use this to assign/unassign devices to people. When unassigned, status should be 'in_stock' or 'decommissioned'. When assigned without status, defaults to 'active'.",
+        inputSchema: zodToJsonSchema(UpdateDeviceMetaSchema),
+      },
+      {
+        name: "get_device_custom_fields",
+        description:
+          "Get all custom fields configured for an organization's devices. Returns field definitions, types (text, date, number, dropdown), and configurations.",
+        inputSchema: zodToJsonSchema(DeviceCustomFieldsSchema),
+      },
+      {
+        name: "create_device_custom_field",
+        description:
+          "Create a new custom field for organization devices. Defines a new field that can be used across all devices in the organization.",
+        inputSchema: zodToJsonSchema(CreateDeviceCustomFieldSchema),
+      },
+      {
+        name: "update_device_custom_field",
+        description:
+          "Update an existing device custom field configuration. Can modify field name, code, visibility for device types, and dropdown configuration.",
+        inputSchema: zodToJsonSchema(UpdateDeviceCustomFieldSchema),
+      },
+      {
+        name: "delete_device_custom_field",
+        description:
+          "Delete a device custom field configuration. Removes a custom field definition from the organization.",
+        inputSchema: zodToJsonSchema(DeleteDeviceCustomFieldSchema),
       },
       {
         name: "get_identities",
@@ -72,9 +158,79 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const toolName = request.params.name;
   const input = request.params.arguments || {};
   try {
+    if (toolName === "get_organization_info") {
+      const response = await getOrganizationInfo();
+      return {
+        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        isError: false,
+      };
+    }
+
     if (toolName === "get_devices") {
       const args = DeviceFiltersSchema.parse(input);
       const response = await getDevices(args);
+      return {
+        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        isError: false,
+      };
+    }
+
+    if (toolName === "create_device") {
+      const args = CreateDeviceSchema.parse(input);
+      const response = await createDevice(args);
+      return {
+        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        isError: false,
+      };
+    }
+
+    if (toolName === "update_device") {
+      const args = UpdateDeviceSchema.parse(input);
+      const response = await updateDevice(args);
+      return {
+        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        isError: false,
+      };
+    }
+
+    if (toolName === "update_device_meta") {
+      const args = UpdateDeviceMetaSchema.parse(input);
+      const response = await updateDeviceMeta(args);
+      return {
+        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        isError: false,
+      };
+    }
+
+    if (toolName === "get_device_custom_fields") {
+      const response = await getDeviceCustomFields();
+      return {
+        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        isError: false,
+      };
+    }
+
+    if (toolName === "create_device_custom_field") {
+      const args = CreateDeviceCustomFieldSchema.parse(input);
+      const response = await createDeviceCustomField(args);
+      return {
+        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        isError: false,
+      };
+    }
+
+    if (toolName === "update_device_custom_field") {
+      const args = UpdateDeviceCustomFieldSchema.parse(input);
+      const response = await updateDeviceCustomField(args);
+      return {
+        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        isError: false,
+      };
+    }
+
+    if (toolName === "delete_device_custom_field") {
+      const args = DeleteDeviceCustomFieldSchema.parse(input);
+      const response = await deleteDeviceCustomField(args);
       return {
         content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
         isError: false,

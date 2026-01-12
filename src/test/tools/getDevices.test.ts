@@ -1,6 +1,5 @@
-import { URLSearchParams } from "node:url";
 import axios from "axios";
-import { AdminaApiClient, getClient, resetClient } from "../../admina-api.js";
+import { resetClient } from "../../admina-api.js";
 import { DeviceFilters, getDevices } from "../../tools/getDevices.js";
 
 // Define the shape of our mock response
@@ -48,9 +47,7 @@ describe("getDevices", () => {
 
   it("should fetch devices with filters", async () => {
     const filters: DeviceFilters = {
-      status: "active",
       limit: 10,
-      locale: "en",
     };
 
     const result = (await getDevices(filters)) as MockApiResponse;
@@ -70,7 +67,7 @@ describe("getDevices", () => {
   });
 
   it("should use default locale when minimal filters provided", async () => {
-    const result = (await getDevices({ locale: "ja" })) as MockApiResponse;
+    const result = (await getDevices({})) as MockApiResponse;
 
     // Verify correct URL with locale parameter
     expect(mockedAxios.get).toHaveBeenCalled();
@@ -96,6 +93,6 @@ describe("getDevices", () => {
     mockedAxios.get.mockRejectedValueOnce(axiosError);
 
     // Expecting the function to throw an error
-    await expect(getDevices({ locale: "en" })).rejects.toThrow();
+    await expect(getDevices({})).rejects.toThrow();
   });
 });
