@@ -1,6 +1,5 @@
-import { URLSearchParams } from "node:url";
 import axios from "axios";
-import { AdminaApiClient, getClient, resetClient } from "../../admina-api.js";
+import { resetClient } from "../../admina-api.js";
 import { DeviceFilters, getDevices } from "../../tools/getDevices.js";
 
 // Define the shape of our mock response
@@ -31,7 +30,8 @@ describe("getDevices", () => {
     resetClient();
 
     // Setup axios mock to return a specific response for the devices endpoint
-    mockedAxios.get.mockImplementation((url) => {
+    // Note: getDevices uses POST /devices/search, so we mock axios.post
+    mockedAxios.post.mockImplementation((url) => {
       // If the URL contains "/devices", return the devices response
       if (url.includes("/devices")) {
         return Promise.resolve({ data: mockDevicesResponse });
@@ -48,35 +48,34 @@ describe("getDevices", () => {
 
   it("should fetch devices with filters", async () => {
     const filters: DeviceFilters = {
-      status: "active",
       limit: 10,
-      locale: "en",
     };
 
     const result = (await getDevices(filters)) as MockApiResponse;
 
-    // Verify axios.get was called with the correct URL pattern
-    expect(mockedAxios.get).toHaveBeenCalled();
-    const callUrl = mockedAxios.get.mock.calls[0][0];
-    expect(callUrl).toContain("/devices");
+    // Verify axios.post was called with the correct URL pattern
+    expect(mockedAxios.post).toHaveBeenCalled();
+    const callUrl = mockedAxios.post.mock.calls[0][0];
+    expect(callUrl).toContain("/devices/search");
 
-    // Verify the parameters were passed correctly
-    expect(callUrl).toContain("status=active");
+    // Verify the limit parameter was passed in query string
     expect(callUrl).toContain("limit=10");
-    expect(callUrl).toContain("locale=en");
 
     // Verify the correct mock response was returned
     expect(result).toEqual(mockDevicesResponse);
   });
 
-  it("should use default locale when minimal filters provided", async () => {
-    const result = (await getDevices({ locale: "ja" })) as MockApiResponse;
+  it("should call devices search endpoint with empty filters", async () => {
+    const result = (await getDevices({})) as MockApiResponse;
 
-    // Verify correct URL with locale parameter
-    expect(mockedAxios.get).toHaveBeenCalled();
-    const callUrl = mockedAxios.get.mock.calls[0][0];
-    expect(callUrl).toContain("/devices");
-    expect(callUrl).toContain("locale=ja");
+    // Verify correct URL for devices search endpoint
+    expect(mockedAxios.post).toHaveBeenCalled();
+    const callUrl = mockedAxios.post.mock.calls[0][0];
+    expect(callUrl).toContain("/devices/search");
+
+    // Verify empty body was passed
+    const callBody = mockedAxios.post.mock.calls[0][1];
+    expect(callBody).toEqual({});
 
     // Verify the mock response was returned
     expect(result).toEqual(mockDevicesResponse);
@@ -93,9 +92,9 @@ describe("getDevices", () => {
     } as any);
 
     // Setup axios to throw the AxiosError
-    mockedAxios.get.mockRejectedValueOnce(axiosError);
+    mockedAxios.post.mockRejectedValueOnce(axiosError);
 
     // Expecting the function to throw an error
-    await expect(getDevices({ locale: "en" })).rejects.toThrow();
+    await expect(getDevices({})).rejects.toThrow();
   });
 });
