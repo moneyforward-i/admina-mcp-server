@@ -6,6 +6,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprot
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { formatAdminaError, isAdminaError } from "./common/errors.js";
+import { IdentityConfigFiltersSchema, getIdentityConfig } from "./tools/getIdentityConfig.js";
 import {
   CreateDeviceCustomFieldSchema,
   CreateDeviceSchema,
@@ -34,7 +35,6 @@ import {
   updateDeviceCustomField,
   updateDeviceMeta,
 } from "./tools/index.js";
-import { getIdentityConfig, IdentityConfigFiltersSchema } from "./tools/getIdentityConfig.js";
 
 const server = new Server(
   {
