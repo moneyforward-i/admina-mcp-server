@@ -35,6 +35,7 @@ import {
   updateDeviceCustomField,
   updateDeviceMeta,
 } from "./tools/index.js";
+import { getIdentityCustomFields, IdentityCustomFieldsFiltersSchema } from "./tools/getIdentityCustomField.js";
 
 const server = new Server(
   {
@@ -157,6 +158,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           "Get configuration for identity fields of a specific identity. Required to filter by a specific identityId to see the effective configuration for that identity.",
         inputSchema: zodToJsonSchema(IdentityConfigFiltersSchema),
       },
+      {
+        name: "get_identity_custom_fields",
+        description:
+          "Get all identity custom fields configured for an organization. Returns field definitions, types (text, date, number, dropdown), and configurations.",
+        inputSchema: zodToJsonSchema(IdentityCustomFieldsFiltersSchema),
+      },
     ],
   };
 });
@@ -180,6 +187,7 @@ const toolHandlers: Record<string, ToolHandler> = {
   get_service_accounts: async (input) => getServiceAccounts(ServiceAccountFiltersSchema.parse(input)),
   get_people_accounts: async (input) => getPeopleAccounts(PeopleAccountsFiltersSchema.parse(input)),
   get_identity_config: async (input) => getIdentityConfig(IdentityConfigFiltersSchema.parse(input)),
+  get_identity_custom_fields: async () => getIdentityCustomFields(),
 };
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
