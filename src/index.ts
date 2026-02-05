@@ -6,6 +6,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprot
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { formatAdminaError, isAdminaError } from "./common/errors.js";
+import { IdentityConfigFiltersSchema, getIdentityConfig } from "./tools/getIdentityConfig.js";
 import {
   CreateDeviceCustomFieldSchema,
   CreateDeviceSchema,
@@ -150,6 +151,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           "Return a list of SaaS accounts belonging to a person. The peopleId can be obtained from the get_identities tool. Can be filtered by role, two-factor authentication, and searched by service name or workspace name",
         inputSchema: zodToJsonSchema(PeopleAccountsFiltersSchema),
       },
+      {
+        name: "get_identity_config",
+        description:
+          "Get configuration for identity fields of a specific identity. Required to filter by a specific identityId to see the effective configuration for that identity.",
+        inputSchema: zodToJsonSchema(IdentityConfigFiltersSchema),
+      },
     ],
   };
 });
@@ -172,6 +179,7 @@ const toolHandlers: Record<string, ToolHandler> = {
   get_services: async (input) => getServices(ServiceFiltersSchema.parse(input)),
   get_service_accounts: async (input) => getServiceAccounts(ServiceAccountFiltersSchema.parse(input)),
   get_people_accounts: async (input) => getPeopleAccounts(PeopleAccountsFiltersSchema.parse(input)),
+  get_identity_config: async (input) => getIdentityConfig(IdentityConfigFiltersSchema.parse(input)),
 };
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {

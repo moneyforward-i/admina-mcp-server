@@ -18,7 +18,7 @@ To configure this MCP server, add the following configuration to your mcp settin
 ```
 {
   "mcpServers": {
-    "admina-mpc-server": {
+    "admina-mcp-server": {
       "command": "npx",
       "args": [
         "-y",

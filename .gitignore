@@ -2,3 +2,4 @@ node_modules
 .env
 .cursor/mcp.json
 build/
+.yarn/
