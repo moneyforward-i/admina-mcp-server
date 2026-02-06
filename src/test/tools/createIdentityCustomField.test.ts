@@ -94,8 +94,8 @@ describe("createIdentityCustomField", () => {
       attributeName: params.attributeName,
       attributeCode: params.attributeCode,
       serviceSource: {
-        serviceFieldId: params.serviceSource.serviceFieldId,
-        workspaceId: params.serviceSource.workspaceId,
+        serviceFieldId: params.serviceSource!.serviceFieldId,
+        workspaceId: params.serviceSource!.workspaceId,
       },
       kind: params.kind,
       configuration: null,
@@ -130,12 +130,34 @@ describe("createIdentityCustomField", () => {
       attributeName: params.attributeName,
       attributeCode: params.attributeCode,
       serviceSource: {
-        serviceFieldId: params.serviceSource.serviceFieldId,
-        workspaceId: params.serviceSource.workspaceId,
+        serviceFieldId: params.serviceSource!.serviceFieldId,
+        workspaceId: params.serviceSource!.workspaceId,
       },
       kind: params.kind,
       configuration: params.configuration,
     });
+  });
+
+  it("should create a custom field without serviceSource", async () => {
+    const params: CreateIdentityCustomFieldParams = {
+      attributeName: "Standalone Field",
+      attributeCode: "standalone_field",
+      kind: "text",
+    };
+
+    await createIdentityCustomField(params);
+
+    expect(mockedAxios.post).toHaveBeenCalled();
+    const callBody = mockedAxios.post.mock.calls[0][1];
+
+    expect(callBody).toEqual({
+      attributeName: params.attributeName,
+      attributeCode: params.attributeCode,
+      kind: params.kind,
+      configuration: null,
+    });
+    // Verify serviceSource is not included in the body
+    expect(callBody).not.toHaveProperty("serviceSource");
   });
 
   it("should handle errors from the API", async () => {
