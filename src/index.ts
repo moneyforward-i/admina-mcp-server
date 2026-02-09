@@ -176,7 +176,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: "update_identity_custom_field",
         description:
-          "Update an existing identity custom field configuration. Can modify field name, code, visibility for identity types, and dropdown configuration.",
+          "Update an existing identity custom field configuration. Can modify field name and code.",
         inputSchema: zodToJsonSchema(UpdateIdentityCustomFieldSchema),
       },
       {
