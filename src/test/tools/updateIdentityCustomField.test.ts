@@ -1,9 +1,6 @@
 import axios from "axios";
 import { resetClient } from "../../admina-api.js";
-import {
-  UpdateIdentityCustomFieldParams,
-  updateIdentityCustomField,
-} from "../../tools/updateIdentityCustomField.js";
+import { UpdateIdentityCustomFieldParams, updateIdentityCustomField } from "../../tools/updateIdentityCustomField.js";
 
 // Define the shape of our mock response
 interface MockApiResponse {

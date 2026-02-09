@@ -3,7 +3,9 @@ import { getClient } from "../admina-api.js";
 import { DropdownConfigurationSchema } from "../common/dropdown-schema.js";
 
 export const CreateIdentityCustomFieldSchema = z.object({
-  kind: z.enum(["text", "textarea", "number", "date", "dropdown", "email"]).describe("The type of the custom field (REQUIRED)"),
+  kind: z
+    .enum(["text", "textarea", "number", "date", "dropdown", "email"])
+    .describe("The type of the custom field (REQUIRED)"),
   configuration: DropdownConfigurationSchema.describe(
     "Dropdown items with id (stable identifier) and value (display name) (REQUIRED)",
   )

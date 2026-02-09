@@ -94,8 +94,8 @@ describe("createIdentityCustomField", () => {
       attributeName: params.attributeName,
       attributeCode: params.attributeCode,
       serviceSource: {
-        serviceFieldId: params.serviceSource!.serviceFieldId,
-        workspaceId: params.serviceSource!.workspaceId,
+        serviceFieldId: params.serviceSource?.serviceFieldId,
+        workspaceId: params.serviceSource?.workspaceId,
       },
       kind: params.kind,
       configuration: null,
@@ -130,8 +130,8 @@ describe("createIdentityCustomField", () => {
       attributeName: params.attributeName,
       attributeCode: params.attributeCode,
       serviceSource: {
-        serviceFieldId: params.serviceSource!.serviceFieldId,
-        workspaceId: params.serviceSource!.workspaceId,
+        serviceFieldId: params.serviceSource?.serviceFieldId,
+        workspaceId: params.serviceSource?.workspaceId,
       },
       kind: params.kind,
       configuration: params.configuration,
