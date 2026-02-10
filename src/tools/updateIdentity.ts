@@ -1,15 +1,7 @@
 import { z } from "zod";
 import { getClient } from "../admina-api.js";
 
-const EmployeeStatusEnum = z.enum([
-  "active",
-  "on_leave",
-  "draft",
-  "preactive",
-  "retired",
-  "untracked",
-  "archived",
-]);
+const EmployeeStatusEnum = z.enum(["active", "on_leave", "draft", "preactive", "retired", "untracked", "archived"]);
 
 const EmployeeTypeEnum = z.enum([
   "board_member",

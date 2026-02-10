@@ -151,8 +151,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "get_identity",
-        description:
-          "Get a single identity by ID. Optionally expand with customFieldsMetadata.",
+        description: "Get a single identity by ID. Optionally expand with customFieldsMetadata.",
         inputSchema: zodToJsonSchema(GetIdentitySchema),
       },
       {
