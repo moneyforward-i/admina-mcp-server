@@ -8,7 +8,7 @@ MCP server for the Admina API.
 - **get_services**: Return a list of services integrations that belongs to organization along with a preview of accounts. [Organization Services API](https://docs.itmc.i.moneyforward.com/reference/publicgetorganizationservices)
 - **get_service_accounts**: Return a list of accounts for a specific service. [Get Service Accounts API](https://docs.itmc.i.moneyforward.com/reference/publicgetserviceaccounts)
 - **get_people_accounts**: Return a list of all SaaS accounts belonging to a person. [Get People Accounts API](https://docs.itmc.i.moneyforward.com/reference/publicgetpeopleaccounts)
-
+- **get_identity_field_configuration**: Get identity field configuration of an organization including preset field settings, field order, and source of truth metadata.
 ## Configuration
 
 To configure the admina-mcp-server, you will need the `organizationId` and an API key. For more details on obtaining your API key, please refer to the [Getting Started Guide](https://docs.itmc.i.moneyforward.com/reference/getting-started-1#step-1-obtain-your-api-key).
