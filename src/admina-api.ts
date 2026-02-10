@@ -104,6 +104,32 @@ export class AdminaApiClient {
     }
   }
 
+  // Generic method to make PUT API calls
+  public async makePutApiCall<T>(
+    endpoint: string,
+    body: Record<string, unknown> = {},
+    config: AxiosRequestConfig = {},
+  ): Promise<T> {
+    try {
+      const url = `${this.ADMINA_API_BASE}/organizations/${this.organizationId}${endpoint}`;
+
+      const response = await axios.put(url, body, {
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          "Content-Type": "application/json",
+        },
+        ...config,
+      });
+
+      return response.data as T;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        throw createAdminaError(error.status ?? 500, error.response?.data);
+      }
+      throw createAdminaError(500, { errorId: "non_axios_error" });
+    }
+  }
+
   // Generic method to make DELETE API calls
   public async makeDeleteApiCall<T>(endpoint: string, config: AxiosRequestConfig = {}): Promise<T> {
     try {
