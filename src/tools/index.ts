@@ -16,3 +16,4 @@ export * from "./getIdentityCustomField.js";
 export * from "./createIdentityCustomField.js";
 export * from "./updateIdentityCustomField.js";
 export * from "./deleteIdentityCustomField.js";
+export * from "./getIdentityFieldConfiguration.js";

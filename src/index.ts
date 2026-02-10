@@ -16,6 +16,7 @@ import {
   DeleteDeviceCustomFieldSchema,
   DeviceCustomFieldsSchema,
   DeviceFiltersSchema,
+  GetIdentityFieldConfigurationSchema,
   IdentityFiltersSchema,
   OrganizationInfoSchema,
   PeopleAccountsFiltersSchema,
@@ -30,6 +31,7 @@ import {
   getDeviceCustomFields,
   getDevices,
   getIdentities,
+  getIdentityFieldConfiguration,
   getOrganizationInfo,
   getPeopleAccounts,
   getServiceAccounts,
@@ -156,6 +158,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: zodToJsonSchema(PeopleAccountsFiltersSchema),
       },
       {
+        name: "get_identity_field_configuration",
+        description:
+          "Get identity field configuration of an organization. Returns preset field configurations, field order, available fields, fields metadata, and field details. Optionally pass an identityId to get the effective configuration for a specific identity.",
+        inputSchema: zodToJsonSchema(GetIdentityFieldConfigurationSchema),
+      },
+      {
         name: "get_identity_config",
         description:
           "Get configuration for identity fields of a specific identity. Required to filter by a specific identityId to see the effective configuration for that identity.",
@@ -206,6 +214,8 @@ const toolHandlers: Record<string, ToolHandler> = {
   get_services: async (input) => getServices(ServiceFiltersSchema.parse(input)),
   get_service_accounts: async (input) => getServiceAccounts(ServiceAccountFiltersSchema.parse(input)),
   get_people_accounts: async (input) => getPeopleAccounts(PeopleAccountsFiltersSchema.parse(input)),
+  get_identity_field_configuration: async (input) =>
+    getIdentityFieldConfiguration(GetIdentityFieldConfigurationSchema.parse(input)),
   get_identity_config: async (input) => getIdentityConfig(IdentityConfigFiltersSchema.parse(input)),
   get_identity_custom_fields: async () => getIdentityCustomFields(),
   create_identity_custom_field: async (input) =>
