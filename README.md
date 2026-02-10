@@ -5,6 +5,10 @@ MCP server for the Admina API.
 
 - **get_devices**: Return a list of devices. [Get Devices API](https://docs.itmc.i.moneyforward.com/reference/publicgetdevices)
 - **get_identities**: Return a list of identities. [Get Identities API](https://docs.itmc.i.moneyforward.com/reference/publicgetidentities)
+- **create_identity**: Create a new identity. Requires employeeStatus, employeeType, firstName, lastName.
+- **get_identity**: Get a single identity by ID. Optionally expand with customFieldsMetadata.
+- **update_identity**: Update an existing identity by ID.
+- **delete_identity**: Delete an identity by ID.
 - **get_services**: Return a list of services integrations that belongs to organization along with a preview of accounts. [Organization Services API](https://docs.itmc.i.moneyforward.com/reference/publicgetorganizationservices)
 - **get_service_accounts**: Return a list of accounts for a specific service. [Get Service Accounts API](https://docs.itmc.i.moneyforward.com/reference/publicgetserviceaccounts)
 - **get_people_accounts**: Return a list of all SaaS accounts belonging to a person. [Get People Accounts API](https://docs.itmc.i.moneyforward.com/reference/publicgetpeopleaccounts)

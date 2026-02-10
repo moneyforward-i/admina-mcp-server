@@ -10,10 +10,13 @@ import { IdentityConfigFiltersSchema, getIdentityConfig } from "./tools/getIdent
 import {
   CreateDeviceCustomFieldSchema,
   CreateDeviceSchema,
+  CreateIdentitySchema,
   DeleteDeviceCustomFieldSchema,
+  DeleteIdentitySchema,
   DeviceCustomFieldsSchema,
   DeviceFiltersSchema,
   GetIdentityFieldConfigurationSchema,
+  GetIdentitySchema,
   IdentityFiltersSchema,
   OrganizationInfoSchema,
   PeopleAccountsFiltersSchema,
@@ -22,12 +25,16 @@ import {
   UpdateDeviceCustomFieldSchema,
   UpdateDeviceMetaSchema,
   UpdateDeviceSchema,
+  UpdateIdentitySchema,
   createDevice,
   createDeviceCustomField,
+  createIdentity,
   deleteDeviceCustomField,
+  deleteIdentity,
   getDeviceCustomFields,
   getDevices,
   getIdentities,
+  getIdentity,
   getIdentityFieldConfiguration,
   getOrganizationInfo,
   getPeopleAccounts,
@@ -36,6 +43,7 @@ import {
   updateDevice,
   updateDeviceCustomField,
   updateDeviceMeta,
+  updateIdentity,
 } from "./tools/index.js";
 
 const server = new Server(
@@ -136,6 +144,29 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: zodToJsonSchema(IdentityFiltersSchema),
       },
       {
+        name: "create_identity",
+        description:
+          "Create a new identity in the organization. Requires employeeStatus, employeeType, firstName, and lastName. Optional: displayName, primaryEmail, department, jobTitle, employeeId, lifecycle, customFields, manager, etc.",
+        inputSchema: zodToJsonSchema(CreateIdentitySchema),
+      },
+      {
+        name: "get_identity",
+        description:
+          "Get a single identity by ID. Optionally expand with customFieldsMetadata.",
+        inputSchema: zodToJsonSchema(GetIdentitySchema),
+      },
+      {
+        name: "update_identity",
+        description:
+          "Update an existing identity. Pass identityId and any fields to update (employeeStatus, employeeType, displayName, primaryEmail, department, jobTitle, customFields, manager, etc.).",
+        inputSchema: zodToJsonSchema(UpdateIdentitySchema),
+      },
+      {
+        name: "delete_identity",
+        description: "Delete an identity by ID. Returns the deleted identity.",
+        inputSchema: zodToJsonSchema(DeleteIdentitySchema),
+      },
+      {
         name: "get_services",
         description:
           "Return a list of services, along with the preview of the accounts. Can be searched by the service name by keyword",
@@ -184,6 +215,10 @@ const toolHandlers: Record<string, ToolHandler> = {
   update_device_custom_field: async (input) => updateDeviceCustomField(UpdateDeviceCustomFieldSchema.parse(input)),
   delete_device_custom_field: async (input) => deleteDeviceCustomField(DeleteDeviceCustomFieldSchema.parse(input)),
   get_identities: async (input) => getIdentities(IdentityFiltersSchema.parse(input)),
+  create_identity: async (input) => createIdentity(CreateIdentitySchema.parse(input)),
+  get_identity: async (input) => getIdentity(GetIdentitySchema.parse(input)),
+  update_identity: async (input) => updateIdentity(UpdateIdentitySchema.parse(input)),
+  delete_identity: async (input) => deleteIdentity(DeleteIdentitySchema.parse(input)),
   get_services: async (input) => getServices(ServiceFiltersSchema.parse(input)),
   get_service_accounts: async (input) => getServiceAccounts(ServiceAccountFiltersSchema.parse(input)),
   get_people_accounts: async (input) => getPeopleAccounts(PeopleAccountsFiltersSchema.parse(input)),
