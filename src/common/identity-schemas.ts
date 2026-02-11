@@ -1,6 +1,14 @@
 import { z } from "zod";
 
-export const EmployeeStatusEnum = z.enum(["active", "on_leave", "draft", "preactive", "retired", "untracked", "archived"]);
+export const EmployeeStatusEnum = z.enum([
+  "active",
+  "on_leave",
+  "draft",
+  "preactive",
+  "retired",
+  "untracked",
+  "archived",
+]);
 
 export const EmployeeTypeEnum = z.enum([
   "board_member",

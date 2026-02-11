@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { getClient } from "../admina-api.js";
 import {
+  DepartmentSchema,
   EmployeeStatusEnum,
   EmployeeTypeEnum,
-  ManagementTypeEnum,
-  DepartmentSchema,
   LifecycleSchema,
+  ManagementTypeEnum,
   ManagerSchema,
 } from "../common/identity-schemas.js";
 
