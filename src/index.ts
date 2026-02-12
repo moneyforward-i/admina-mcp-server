@@ -7,6 +7,7 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { formatAdminaError, isAdminaError } from "./common/errors.js";
 import { IdentityConfigFiltersSchema, getIdentityConfig } from "./tools/getIdentityConfig.js";
+import { IdentityCustomFieldsFiltersSchema, getIdentityCustomFields } from "./tools/getIdentityCustomField.js";
 import {
   CreateDeviceCustomFieldSchema,
   CreateDeviceSchema,
@@ -165,6 +166,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           "Get configuration for identity fields of a specific identity. Required to filter by a specific identityId to see the effective configuration for that identity.",
         inputSchema: zodToJsonSchema(IdentityConfigFiltersSchema),
       },
+      {
+        name: "get_identity_custom_fields",
+        description:
+          "Get all identity custom fields configured for an organization. Returns field definitions, types (text, date, number, dropdown), and configurations.",
+        inputSchema: zodToJsonSchema(IdentityCustomFieldsFiltersSchema),
+      },
     ],
   };
 });
@@ -190,6 +197,7 @@ const toolHandlers: Record<string, ToolHandler> = {
   get_identity_field_configuration: async (input) =>
     getIdentityFieldConfiguration(GetIdentityFieldConfigurationSchema.parse(input)),
   get_identity_config: async (input) => getIdentityConfig(IdentityConfigFiltersSchema.parse(input)),
+  get_identity_custom_fields: async () => getIdentityCustomFields(),
 };
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
