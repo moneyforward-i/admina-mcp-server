@@ -12,3 +12,6 @@ export * from "./createDeviceCustomField.js";
 export * from "./updateDeviceCustomField.js";
 export * from "./deleteDeviceCustomField.js";
 export * from "./getIdentityFieldConfiguration.js";
+export * from "./checkIdentityManagementType.js";
+export * from "./getIdentitiesStats.js";
+export * from "./mergeIdentities.js";

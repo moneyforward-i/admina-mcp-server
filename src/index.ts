@@ -9,13 +9,16 @@ import { formatAdminaError, isAdminaError } from "./common/errors.js";
 import { IdentityConfigFiltersSchema, getIdentityConfig } from "./tools/getIdentityConfig.js";
 import { IdentityCustomFieldsFiltersSchema, getIdentityCustomFields } from "./tools/getIdentityCustomField.js";
 import {
+  CheckIdentityManagementTypeSchema,
   CreateDeviceCustomFieldSchema,
   CreateDeviceSchema,
   DeleteDeviceCustomFieldSchema,
   DeviceCustomFieldsSchema,
   DeviceFiltersSchema,
+  GetIdentitiesStatsSchema,
   GetIdentityFieldConfigurationSchema,
   IdentityFiltersSchema,
+  MergeIdentitiesSchema,
   OrganizationInfoSchema,
   PeopleAccountsFiltersSchema,
   ServiceAccountFiltersSchema,
@@ -23,17 +26,20 @@ import {
   UpdateDeviceCustomFieldSchema,
   UpdateDeviceMetaSchema,
   UpdateDeviceSchema,
+  checkIdentityManagementType,
   createDevice,
   createDeviceCustomField,
   deleteDeviceCustomField,
   getDeviceCustomFields,
   getDevices,
   getIdentities,
+  getIdentitiesStats,
   getIdentityFieldConfiguration,
   getOrganizationInfo,
   getPeopleAccounts,
   getServiceAccounts,
   getServices,
+  mergeIdentities,
   updateDevice,
   updateDeviceCustomField,
   updateDeviceMeta,
@@ -172,6 +178,24 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           "Get all identity custom fields configured for an organization. Returns field definitions, types (text, date, number, dropdown), and configurations.",
         inputSchema: zodToJsonSchema(IdentityCustomFieldsFiltersSchema),
       },
+      {
+        name: "check_identity_management_type",
+        description:
+          "Check Identity management type. Use this endpoint to determine the management type for an identity based on email or identityId. Returns the management type (e.g., hr_master, manual, unregistered).",
+        inputSchema: zodToJsonSchema(CheckIdentityManagementTypeSchema),
+      },
+      {
+        name: "get_identities_stats",
+        description:
+          "Get identities statistics for an organization. Returns management type counts, HR master integration information, and domain lists. Use this to understand the distribution of identities across different management types and HR systems.",
+        inputSchema: zodToJsonSchema(GetIdentitiesStatsSchema),
+      },
+      {
+        name: "merge_identities",
+        description:
+          "Merge identities in batch. Use this to merge multiple people entities or identity entities. Supports up to 50 merge operations per request. Can merge people entities (by peopleId) or identity entities (by identityId) in a single operation.",
+        inputSchema: zodToJsonSchema(MergeIdentitiesSchema),
+      },
     ],
   };
 });
@@ -198,6 +222,10 @@ const toolHandlers: Record<string, ToolHandler> = {
     getIdentityFieldConfiguration(GetIdentityFieldConfigurationSchema.parse(input)),
   get_identity_config: async (input) => getIdentityConfig(IdentityConfigFiltersSchema.parse(input)),
   get_identity_custom_fields: async () => getIdentityCustomFields(),
+  check_identity_management_type: async (input) =>
+    checkIdentityManagementType(CheckIdentityManagementTypeSchema.parse(input)),
+  get_identities_stats: async (input) => getIdentitiesStats(GetIdentitiesStatsSchema.parse(input)),
+  merge_identities: async (input) => mergeIdentities(MergeIdentitiesSchema.parse(input)),
 };
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
