@@ -6,6 +6,8 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprot
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { formatAdminaError, isAdminaError } from "./common/errors.js";
+import { CreateIdentityCustomFieldSchema, createIdentityCustomField } from "./tools/createIdentityCustomField.js";
+import { DeleteIdentityCustomFieldSchema, deleteIdentityCustomField } from "./tools/deleteIdentityCustomField.js";
 import { IdentityConfigFiltersSchema, getIdentityConfig } from "./tools/getIdentityConfig.js";
 import { IdentityCustomFieldsFiltersSchema, getIdentityCustomFields } from "./tools/getIdentityCustomField.js";
 import {
@@ -46,6 +48,7 @@ import {
   updateDeviceMeta,
   updateIdentity,
 } from "./tools/index.js";
+import { UpdateIdentityCustomFieldSchema, updateIdentityCustomField } from "./tools/updateIdentityCustomField.js";
 
 const server = new Server(
   {
@@ -202,6 +205,23 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           "Get all identity custom fields configured for an organization. Returns field definitions, types (text, date, number, dropdown), and configurations.",
         inputSchema: zodToJsonSchema(IdentityCustomFieldsFiltersSchema),
       },
+      {
+        name: "create_identity_custom_field",
+        description:
+          "Create a new identity custom field for an organization. Defines a new field that can be used across all identities in the organization.",
+        inputSchema: zodToJsonSchema(CreateIdentityCustomFieldSchema),
+      },
+      {
+        name: "update_identity_custom_field",
+        description: "Update an existing identity custom field configuration. Can modify field name and code.",
+        inputSchema: zodToJsonSchema(UpdateIdentityCustomFieldSchema),
+      },
+      {
+        name: "delete_identity_custom_field",
+        description:
+          "Delete an identity custom field for an organization. Removes a custom field definition from the organization.",
+        inputSchema: zodToJsonSchema(DeleteIdentityCustomFieldSchema),
+      },
     ],
   };
 });
@@ -232,6 +252,12 @@ const toolHandlers: Record<string, ToolHandler> = {
     getIdentityFieldConfiguration(GetIdentityFieldConfigurationSchema.parse(input)),
   get_identity_config: async (input) => getIdentityConfig(IdentityConfigFiltersSchema.parse(input)),
   get_identity_custom_fields: async () => getIdentityCustomFields(),
+  create_identity_custom_field: async (input) =>
+    createIdentityCustomField(CreateIdentityCustomFieldSchema.parse(input)),
+  update_identity_custom_field: async (input) =>
+    updateIdentityCustomField(UpdateIdentityCustomFieldSchema.parse(input)),
+  delete_identity_custom_field: async (input) =>
+    deleteIdentityCustomField(DeleteIdentityCustomFieldSchema.parse(input)),
 };
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
