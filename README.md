@@ -25,6 +25,10 @@ MCP server for the Admina API.
 - **check_identity_management_type**: Determine the management type for an identity based on email or identityId.
 - **get_identities_stats**: Get identities statistics including management type counts, HR master integration info, and domain lists.
 - **merge_identities**: Merge identities in batch (supports up to 50 merge operations per request).
+- **create_identity**: Create a new identity. Requires employeeStatus, employeeType, firstName, lastName.
+- **get_identity**: Get a single identity by ID. Optionally expand with customFieldsMetadata.
+- **update_identity**: Update an existing identity by ID.
+- **delete_identity**: Delete an identity by ID.
 
 ### Services & Accounts
 - **get_services**: Return a list of services integrations that belongs to organization along with a preview of accounts. [Organization Services API](https://docs.itmc.i.moneyforward.com/reference/publicgetorganizationservices)

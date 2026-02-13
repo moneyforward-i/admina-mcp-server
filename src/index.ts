@@ -6,17 +6,22 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprot
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { formatAdminaError, isAdminaError } from "./common/errors.js";
+import { CreateIdentityCustomFieldSchema, createIdentityCustomField } from "./tools/createIdentityCustomField.js";
+import { DeleteIdentityCustomFieldSchema, deleteIdentityCustomField } from "./tools/deleteIdentityCustomField.js";
 import { IdentityConfigFiltersSchema, getIdentityConfig } from "./tools/getIdentityConfig.js";
 import { IdentityCustomFieldsFiltersSchema, getIdentityCustomFields } from "./tools/getIdentityCustomField.js";
 import {
   CheckIdentityManagementTypeSchema,
   CreateDeviceCustomFieldSchema,
   CreateDeviceSchema,
+  CreateIdentitySchema,
   DeleteDeviceCustomFieldSchema,
+  DeleteIdentitySchema,
   DeviceCustomFieldsSchema,
   DeviceFiltersSchema,
   GetIdentitiesStatsSchema,
   GetIdentityFieldConfigurationSchema,
+  GetIdentitySchema,
   IdentityFiltersSchema,
   MergeIdentitiesSchema,
   OrganizationInfoSchema,
@@ -26,14 +31,18 @@ import {
   UpdateDeviceCustomFieldSchema,
   UpdateDeviceMetaSchema,
   UpdateDeviceSchema,
+  UpdateIdentitySchema,
   checkIdentityManagementType,
   createDevice,
   createDeviceCustomField,
+  createIdentity,
   deleteDeviceCustomField,
+  deleteIdentity,
   getDeviceCustomFields,
   getDevices,
   getIdentities,
   getIdentitiesStats,
+  getIdentity,
   getIdentityFieldConfiguration,
   getOrganizationInfo,
   getPeopleAccounts,
@@ -43,7 +52,9 @@ import {
   updateDevice,
   updateDeviceCustomField,
   updateDeviceMeta,
+  updateIdentity,
 } from "./tools/index.js";
+import { UpdateIdentityCustomFieldSchema, updateIdentityCustomField } from "./tools/updateIdentityCustomField.js";
 
 const server = new Server(
   {
@@ -143,6 +154,28 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: zodToJsonSchema(IdentityFiltersSchema),
       },
       {
+        name: "create_identity",
+        description:
+          "Create a new identity in the organization. Requires employeeStatus, employeeType, firstName, and lastName. Optional: displayName, primaryEmail, department, jobTitle, employeeId, lifecycle, customFields, manager, etc.",
+        inputSchema: zodToJsonSchema(CreateIdentitySchema),
+      },
+      {
+        name: "get_identity",
+        description: "Get a single identity by ID. Optionally expand with customFieldsMetadata.",
+        inputSchema: zodToJsonSchema(GetIdentitySchema),
+      },
+      {
+        name: "update_identity",
+        description:
+          "Update an existing identity. Pass identityId and any fields to update (employeeStatus, employeeType, displayName, primaryEmail, department, jobTitle, customFields, manager, etc.).",
+        inputSchema: zodToJsonSchema(UpdateIdentitySchema),
+      },
+      {
+        name: "delete_identity",
+        description: "Delete an identity by ID. Returns the deleted identity.",
+        inputSchema: zodToJsonSchema(DeleteIdentitySchema),
+      },
+      {
         name: "get_services",
         description:
           "Return a list of services, along with the preview of the accounts. Can be searched by the service name by keyword",
@@ -196,6 +229,23 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           "Merge identities in batch. Use this to merge multiple people entities or identity entities. Supports up to 50 merge operations per request. Can merge people entities (by peopleId) or identity entities (by identityId) in a single operation.",
         inputSchema: zodToJsonSchema(MergeIdentitiesSchema),
       },
+      {
+        name: "create_identity_custom_field",
+        description:
+          "Create a new identity custom field for an organization. Defines a new field that can be used across all identities in the organization.",
+        inputSchema: zodToJsonSchema(CreateIdentityCustomFieldSchema),
+      },
+      {
+        name: "update_identity_custom_field",
+        description: "Update an existing identity custom field configuration. Can modify field name and code.",
+        inputSchema: zodToJsonSchema(UpdateIdentityCustomFieldSchema),
+      },
+      {
+        name: "delete_identity_custom_field",
+        description:
+          "Delete an identity custom field for an organization. Removes a custom field definition from the organization.",
+        inputSchema: zodToJsonSchema(DeleteIdentityCustomFieldSchema),
+      },
     ],
   };
 });
@@ -215,6 +265,10 @@ const toolHandlers: Record<string, ToolHandler> = {
   update_device_custom_field: async (input) => updateDeviceCustomField(UpdateDeviceCustomFieldSchema.parse(input)),
   delete_device_custom_field: async (input) => deleteDeviceCustomField(DeleteDeviceCustomFieldSchema.parse(input)),
   get_identities: async (input) => getIdentities(IdentityFiltersSchema.parse(input)),
+  create_identity: async (input) => createIdentity(CreateIdentitySchema.parse(input)),
+  get_identity: async (input) => getIdentity(GetIdentitySchema.parse(input)),
+  update_identity: async (input) => updateIdentity(UpdateIdentitySchema.parse(input)),
+  delete_identity: async (input) => deleteIdentity(DeleteIdentitySchema.parse(input)),
   get_services: async (input) => getServices(ServiceFiltersSchema.parse(input)),
   get_service_accounts: async (input) => getServiceAccounts(ServiceAccountFiltersSchema.parse(input)),
   get_people_accounts: async (input) => getPeopleAccounts(PeopleAccountsFiltersSchema.parse(input)),
@@ -226,6 +280,12 @@ const toolHandlers: Record<string, ToolHandler> = {
     checkIdentityManagementType(CheckIdentityManagementTypeSchema.parse(input)),
   get_identities_stats: async (input) => getIdentitiesStats(GetIdentitiesStatsSchema.parse(input)),
   merge_identities: async (input) => mergeIdentities(MergeIdentitiesSchema.parse(input)),
+  create_identity_custom_field: async (input) =>
+    createIdentityCustomField(CreateIdentityCustomFieldSchema.parse(input)),
+  update_identity_custom_field: async (input) =>
+    updateIdentityCustomField(UpdateIdentityCustomFieldSchema.parse(input)),
+  delete_identity_custom_field: async (input) =>
+    deleteIdentityCustomField(DeleteIdentityCustomFieldSchema.parse(input)),
 };
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
