@@ -21,3 +21,6 @@ export * from "./createIdentityCustomField.js";
 export * from "./updateIdentityCustomField.js";
 export * from "./deleteIdentityCustomField.js";
 export * from "./getIdentityFieldConfiguration.js";
+export * from "./checkIdentityManagementType.js";
+export * from "./getIdentitiesStats.js";
+export * from "./mergeIdentities.js";
