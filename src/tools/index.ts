@@ -24,3 +24,8 @@ export * from "./getIdentityFieldConfiguration.js";
 export * from "./checkIdentityManagementType.js";
 export * from "./getIdentitiesStats.js";
 export * from "./mergeIdentities.js";
+export * from "./unmergeIdentities.js";
+export * from "./bulkUpdateIdentities.js";
+export * from "./getIdentityHistory.js";
+export * from "./archiveIdentity.js";
+export * from "./unregisterIdentity.js";

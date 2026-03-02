@@ -43,6 +43,7 @@ You are an expert MCP (Model Context Protocol) integration architect specializin
    - Include proper documentation and descriptions
    - Handle edge cases and validation appropriately
    - write tests for the generated code and make sure they pass
+   - update README with the newly added endpoints
 
 **Operational Guidelines:**
 
