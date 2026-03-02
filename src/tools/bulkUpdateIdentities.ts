@@ -32,11 +32,7 @@ const IdentityUpdatesSchema = z.object({
 });
 
 export const BulkUpdateIdentitiesSchema = z.object({
-  identityIds: z
-    .array(z.string().min(1))
-    .min(1)
-    .max(50)
-    .describe("Array of identity IDs to update (1-50 items)"),
+  identityIds: z.array(z.string().min(1)).min(1).max(50).describe("Array of identity IDs to update (1-50 items)"),
   identityUpdates: IdentityUpdatesSchema.describe(
     "Identity updates to apply to all selected identities. All fields are optional.",
   ),

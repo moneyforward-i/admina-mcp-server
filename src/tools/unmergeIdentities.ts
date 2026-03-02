@@ -8,12 +8,7 @@ export const UnmergeIdentitiesSchema = z.object({
     .max(50)
     .optional()
     .describe("List of people IDs to unmerge (1-50 items)."),
-  identityIds: z
-    .array(z.string())
-    .min(1)
-    .max(50)
-    .optional()
-    .describe("List of identity IDs to unmerge (1-50 items)."),
+  identityIds: z.array(z.string()).min(1).max(50).optional().describe("List of identity IDs to unmerge (1-50 items)."),
 });
 
 export type UnmergeIdentitiesParams = z.infer<typeof UnmergeIdentitiesSchema>;

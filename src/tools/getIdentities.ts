@@ -47,10 +47,7 @@ export const IdentityFiltersSchema = z.object({
   identityIds: z.array(z.string()).optional().describe("Filter results by identityIds. Accepts multiple options."),
   peopleIds: z.array(z.number()).optional().describe("Filter results by peopleIds. Accepts multiple options."),
   excludeIds: z.array(z.string()).optional().describe("Exclude identities by id. Accepts multiple options."),
-  alertTypes: z
-    .array(AlertTypeEnum)
-    .optional()
-    .describe("Filter results by alert type. Accepts multiple options."),
+  alertTypes: z.array(AlertTypeEnum).optional().describe("Filter results by alert type. Accepts multiple options."),
   expands: z
     .array(IdentityExpandEnum)
     .optional()
@@ -60,9 +57,7 @@ export const IdentityFiltersSchema = z.object({
   contractStartRange: z
     .string()
     .optional()
-    .describe(
-      "Filter results by contract start date range. Format: YYYY-MM-DD:YYYY-MM-DD, separated by a colon.",
-    ),
+    .describe("Filter results by contract start date range. Format: YYYY-MM-DD:YYYY-MM-DD, separated by a colon."),
   contractEndRange: z
     .string()
     .optional()
@@ -70,15 +65,11 @@ export const IdentityFiltersSchema = z.object({
   suspensionStartRange: z
     .string()
     .optional()
-    .describe(
-      "Filter results by suspension start date range. Format: YYYY-MM-DD:YYYY-MM-DD, separated by a colon.",
-    ),
+    .describe("Filter results by suspension start date range. Format: YYYY-MM-DD:YYYY-MM-DD, separated by a colon."),
   suspensionEndRange: z
     .string()
     .optional()
-    .describe(
-      "Filter results by suspension end date range. Format: YYYY-MM-DD:YYYY-MM-DD, separated by a colon.",
-    ),
+    .describe("Filter results by suspension end date range. Format: YYYY-MM-DD:YYYY-MM-DD, separated by a colon."),
   createdAtRange: z
     .string()
     .optional()
@@ -94,23 +85,16 @@ export const IdentityFiltersSchema = z.object({
   customFields: z
     .record(z.string(), z.string())
     .optional()
-    .describe(
-      "Filter results by custom fields. For date fields, use date range format: YYYY-MM-DD:YYYY-MM-DD",
-    ),
+    .describe("Filter results by custom fields. For date fields, use date range format: YYYY-MM-DD:YYYY-MM-DD"),
   hasHRM: z
     .boolean()
     .optional()
-    .describe(
-      "Filter results by HRM (employee master) linkage. When true, returns only UIDs with HRM linkage.",
-    ),
+    .describe("Filter results by HRM (employee master) linkage. When true, returns only UIDs with HRM linkage."),
   haveAssignedDevice: z
     .boolean()
     .optional()
     .describe("Filter results by identities that have at least one assigned device."),
-  haveSaasAccount: z
-    .boolean()
-    .optional()
-    .describe("Filter results by identities that have at least one SaaS account."),
+  haveSaasAccount: z.boolean().optional().describe("Filter results by identities that have at least one SaaS account."),
   includeActiveInternalOnly: z
     .boolean()
     .optional()
