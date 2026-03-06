@@ -2,6 +2,11 @@ import { URLSearchParams } from "node:url";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { createAdminaError } from "./common/errors.js";
 
+// Header sent on every request so the API can distinguish MCP (AI) calls from other clients for usage tracking
+export const MCP_USAGE_TRACKING_HEADERS = {
+  "X-Request-Source": "mcp",
+} as const;
+
 function getConfig(): { apiKey: string; organizationId: string } {
   if (!process.env.ADMINA_API_KEY || !process.env.ADMINA_ORGANIZATION_ID) {
     throw new Error("ADMINA_API_KEY and ADMINA_ORGANIZATION_ID must be set");
@@ -36,6 +41,7 @@ export class AdminaApiClient {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
+          ...MCP_USAGE_TRACKING_HEADERS,
         },
         ...config,
       });
@@ -65,6 +71,7 @@ export class AdminaApiClient {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
+          ...MCP_USAGE_TRACKING_HEADERS,
         },
         ...config,
       });
@@ -91,6 +98,7 @@ export class AdminaApiClient {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
+          ...MCP_USAGE_TRACKING_HEADERS,
         },
         ...config,
       });
@@ -117,6 +125,7 @@ export class AdminaApiClient {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
+          ...MCP_USAGE_TRACKING_HEADERS,
         },
         ...config,
       });
@@ -139,6 +148,7 @@ export class AdminaApiClient {
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
+          ...MCP_USAGE_TRACKING_HEADERS,
         },
         ...config,
       });
