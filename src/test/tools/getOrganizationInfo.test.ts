@@ -1,5 +1,5 @@
 import axios from "axios";
-import { resetClient } from "../../admina-api.js";
+import { MCP_USAGE_TRACKING_HEADERS, resetClient } from "../../admina-api.js";
 import { getOrganizationInfo } from "../../tools/getOrganizationInfo.js";
 
 // Define the shape of our mock response
@@ -41,6 +41,8 @@ describe("getOrganizationInfo", () => {
     expect(mockedAxios.get).toHaveBeenCalled();
     const callUrl = mockedAxios.get.mock.calls[0][0];
     expect(callUrl).toContain("/organizations/");
+    const callConfig = mockedAxios.get.mock.calls[0][1];
+    expect(callConfig?.headers).toMatchObject(MCP_USAGE_TRACKING_HEADERS);
 
     expect(result).toEqual(mockOrganizationResponse);
   });
