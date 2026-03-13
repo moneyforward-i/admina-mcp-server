@@ -20,15 +20,20 @@ MCP server for the Admina API.
 
 ### Identities
 - **get_identities**: Return a list of identities. [Get Identities API](https://docs.itmc.i.moneyforward.com/reference/publicgetidentities)
+- **create_identity**: Create a new identity. Requires employeeStatus, employeeType, firstName, lastName.
+- **get_identity**: Get a single identity by ID. Optionally expand with customFieldsMetadata.
+- **update_identity**: Update an existing identity by ID.
+- **delete_identity**: Delete an identity by ID.
 - **get_identity_field_configuration**: Get identity field configuration of an organization including preset field settings, field order, and source of truth metadata.
 - **get_identity_config**: Get configuration for identity fields of a specific identity.
 - **check_identity_management_type**: Determine the management type for an identity based on email or identityId.
 - **get_identities_stats**: Get identities statistics including management type counts, HR master integration info, and domain lists.
 - **merge_identities**: Merge identities in batch (supports up to 50 merge operations per request).
-- **create_identity**: Create a new identity. Requires employeeStatus, employeeType, firstName, lastName.
-- **get_identity**: Get a single identity by ID. Optionally expand with customFieldsMetadata.
-- **update_identity**: Update an existing identity by ID.
-- **delete_identity**: Delete an identity by ID.
+- **unmerge_identities**: Unmerge previously merged people or identity entities (supports up to 50 unmerge operations per request).
+- **bulk_update_identities**: Bulk update multiple identities in a single request. Provide a list of identity IDs (1-50) and a set of field updates to apply to all of them.
+- **get_identity_history**: Get the change history of a specific identity. Returns a paginated list of field-level changes, action types, sources, and actors.
+- **archive_identity**: Toggle the archive flag for an identity by ID. Returns the updated identity.
+- **unregister_identity**: Toggle the unregistered management type for an identity by ID. Returns the updated identity.
 
 ### Services & Accounts
 - **get_services**: Return a list of services integrations that belongs to organization along with a preview of accounts. [Organization Services API](https://docs.itmc.i.moneyforward.com/reference/publicgetorganizationservices)
@@ -81,4 +86,4 @@ yarn version --new-version <new version>
 - Set the Target as main.
 - Set the Release title to the tag you created, vX.Y.Z
 - Click "Publish release" to save and publish your release.
-- GitHub Actions workflow will be triggerd by publishing a new release and the package will be released.
+- GitHub Actions workflow will be triggered by publishing a new release and the package will be released.

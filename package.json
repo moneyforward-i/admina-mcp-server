@@ -8,9 +8,7 @@
     "mcp-server"
   ],
   "main": "./build/index.js",
-  "bin": {
-    "admina-mcp-server": "./build/index.js"
-  },
+  "bin": "./build/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/moneyforward-i/admina-mcp-server.git"
@@ -20,7 +18,7 @@
     "build:dev": "tsc -w",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "inspector": "source .env && npx @modelcontextprotocol/inspector build/index.js -e ADMINA_API_KEY=$ADMINA_API_KEY -e ADMINA_ORGANIZATION_ID=$ADMINA_ORGANIZATION_ID",
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js -e ADMINA_API_KEY=$ADMINA_API_KEY -e ADMINA_ORGANIZATION_ID=$ADMINA_ORGANIZATION_ID",
     "test": "jest"
   },
   "files": [

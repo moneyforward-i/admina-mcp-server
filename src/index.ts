@@ -11,6 +11,8 @@ import { DeleteIdentityCustomFieldSchema, deleteIdentityCustomField } from "./to
 import { IdentityConfigFiltersSchema, getIdentityConfig } from "./tools/getIdentityConfig.js";
 import { IdentityCustomFieldsFiltersSchema, getIdentityCustomFields } from "./tools/getIdentityCustomField.js";
 import {
+  ArchiveIdentitySchema,
+  BulkUpdateIdentitiesSchema,
   CheckIdentityManagementTypeSchema,
   CreateDeviceCustomFieldSchema,
   CreateDeviceSchema,
@@ -21,6 +23,7 @@ import {
   DeviceFiltersSchema,
   GetIdentitiesStatsSchema,
   GetIdentityFieldConfigurationSchema,
+  GetIdentityHistorySchema,
   GetIdentitySchema,
   IdentityFiltersSchema,
   MergeIdentitiesSchema,
@@ -28,10 +31,14 @@ import {
   PeopleAccountsFiltersSchema,
   ServiceAccountFiltersSchema,
   ServiceFiltersSchema,
+  UnmergeIdentitiesSchema,
+  UnregisterIdentitySchema,
   UpdateDeviceCustomFieldSchema,
   UpdateDeviceMetaSchema,
   UpdateDeviceSchema,
   UpdateIdentitySchema,
+  archiveIdentity,
+  bulkUpdateIdentities,
   checkIdentityManagementType,
   createDevice,
   createDeviceCustomField,
@@ -44,11 +51,14 @@ import {
   getIdentitiesStats,
   getIdentity,
   getIdentityFieldConfiguration,
+  getIdentityHistory,
   getOrganizationInfo,
   getPeopleAccounts,
   getServiceAccounts,
   getServices,
   mergeIdentities,
+  unmergeIdentities,
+  unregisterIdentity,
   updateDevice,
   updateDeviceCustomField,
   updateDeviceMeta,
@@ -230,6 +240,36 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: zodToJsonSchema(MergeIdentitiesSchema),
       },
       {
+        name: "unmerge_identities",
+        description:
+          "Unmerge previously merged identity/people entities. Provide peopleIds, identityIds, or both to unmerge (up to 50 items each).",
+        inputSchema: zodToJsonSchema(UnmergeIdentitiesSchema),
+      },
+      {
+        name: "bulk_update_identities",
+        description:
+          "Bulk update multiple identities in a single request. Provide a list of identity IDs (1-50) and a set of field updates to apply to all of them. All identity update fields are optional.",
+        inputSchema: zodToJsonSchema(BulkUpdateIdentitiesSchema),
+      },
+      {
+        name: "get_identity_history",
+        description:
+          "Get the change history of a specific identity. Returns a paginated list of history records showing field-level changes, action types, sources, and actors.",
+        inputSchema: zodToJsonSchema(GetIdentityHistorySchema),
+      },
+      {
+        name: "archive_identity",
+        description:
+          "Toggle the archive flag for an identity. Returns the updated identity with the new archive state.",
+        inputSchema: zodToJsonSchema(ArchiveIdentitySchema),
+      },
+      {
+        name: "unregister_identity",
+        description:
+          "Toggle the unregistered management type for an identity. Returns the updated identity with the new management type.",
+        inputSchema: zodToJsonSchema(UnregisterIdentitySchema),
+      },
+      {
         name: "create_identity_custom_field",
         description:
           "Create a new identity custom field for an organization. Defines a new field that can be used across all identities in the organization.",
@@ -280,6 +320,11 @@ const toolHandlers: Record<string, ToolHandler> = {
     checkIdentityManagementType(CheckIdentityManagementTypeSchema.parse(input)),
   get_identities_stats: async (input) => getIdentitiesStats(GetIdentitiesStatsSchema.parse(input)),
   merge_identities: async (input) => mergeIdentities(MergeIdentitiesSchema.parse(input)),
+  unmerge_identities: async (input) => unmergeIdentities(UnmergeIdentitiesSchema.parse(input)),
+  bulk_update_identities: async (input) => bulkUpdateIdentities(BulkUpdateIdentitiesSchema.parse(input)),
+  get_identity_history: async (input) => getIdentityHistory(GetIdentityHistorySchema.parse(input)),
+  archive_identity: async (input) => archiveIdentity(ArchiveIdentitySchema.parse(input)),
+  unregister_identity: async (input) => unregisterIdentity(UnregisterIdentitySchema.parse(input)),
   create_identity_custom_field: async (input) =>
     createIdentityCustomField(CreateIdentityCustomFieldSchema.parse(input)),
   update_identity_custom_field: async (input) =>
