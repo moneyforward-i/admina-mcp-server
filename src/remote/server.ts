@@ -8,11 +8,32 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprot
 import { proxyToolCall } from "./proxy.js";
 import type { ToolRegistry } from "./types.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Resolve the directory of this module at runtime.
+// In production the package is compiled to ESM (import.meta.url works).
+// In the Jest/CJS test context we fall back to process.cwd() because ts-jest
+// compiles to CJS where import.meta is unavailable.
+// The registry path ultimately does not matter in tests because readFileSync
+// is mocked to intercept any path containing "tools.json".
+function getModuleDir(): string {
+  // Avoid import.meta syntax at the top level — ts-jest compiles server.ts
+  // with supportsStaticESM=false (CJS output) while leaving import.meta.url
+  // untranspiled, which causes a runtime SyntaxError.  We use eval so the
+  // CJS parser never sees the import.meta token.
+  try {
+    // eslint-disable-next-line no-eval
+    const metaUrl: string = eval("import.meta.url");
+    return path.dirname(fileURLToPath(metaUrl));
+  } catch {
+    // Fallback: when running under Jest/CJS, resolve relative to process.cwd().
+    // readFileSync is mocked in tests so the exact path doesn't matter as long
+    // as it contains "tools.json".
+    return path.resolve(process.cwd(), "src", "remote");
+  }
+}
 
 // Load tool registry once at module load time
 function loadRegistry(): ToolRegistry {
-  const registryPath = path.join(__dirname, "../generated/tools.json");
+  const registryPath = path.join(getModuleDir(), "../generated/tools.json");
   try {
     return JSON.parse(readFileSync(registryPath, "utf-8")) as ToolRegistry;
   } catch {
