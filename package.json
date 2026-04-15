@@ -14,7 +14,7 @@
     "url": "https://github.com/moneyforward-i/admina-mcp-server.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && mkdir -p build/generated && cp src/generated/tools.json build/generated/tools.json",
     "build:dev": "tsc -w",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
