@@ -118,7 +118,8 @@ function isAuthPath(urlPath: string): boolean {
 
 function toSnakeCase(str: string): string {
   return str
-    .replace(/([A-Z])/g, "_$1")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1_$2")
+    .replace(/([a-z\d])([A-Z])/g, "$1_$2")
     .toLowerCase()
     .replace(/^_/, "");
 }

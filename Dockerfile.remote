@@ -16,7 +16,6 @@ COPY scripts/ ./scripts/
 
 # Generate tool registry from OpenAPI spec at image build time
 ARG VULCAN_OPENAPI_URL
-ENV VULCAN_OPENAPI_URL=${VULCAN_OPENAPI_URL}
 RUN yarn generate:tools
 
 # Compile TypeScript

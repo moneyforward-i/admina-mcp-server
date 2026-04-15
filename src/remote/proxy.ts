@@ -31,6 +31,12 @@ export async function proxyToolCall(
     }
   }
 
+  // Validate all path parameter placeholders were resolved
+  const unresolvedPlaceholders = resolvedPath.match(/\{[^}]+\}/g);
+  if (unresolvedPlaceholders) {
+    throw new Error(`Missing required path parameters: ${unresolvedPlaceholders.join(", ")}`);
+  }
+
   // 2. Build query params from "query" parameters
   const queryParamNames = new Set<string>();
   const queryString = new URLSearchParams();
@@ -70,6 +76,7 @@ export async function proxyToolCall(
         "Content-Type": "application/json",
         "X-Request-Source": "mcp",
       },
+      timeout: 30000,
       ...(tool.hasBody ? { data: body } : {}),
     });
     return response.data;
