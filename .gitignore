@@ -3,3 +3,4 @@ node_modules
 .cursor/mcp.json
 build/
 .yarn/
+src/generated/

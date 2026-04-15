@@ -19,7 +19,9 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js -e ADMINA_API_KEY=$ADMINA_API_KEY -e ADMINA_ORGANIZATION_ID=$ADMINA_ORGANIZATION_ID",
-    "test": "jest"
+    "test": "jest",
+    "generate:tools": "tsx scripts/generate-tools.ts",
+    "start:remote": "node build/remote/index.js"
   },
   "files": [
     "build"
@@ -36,6 +38,7 @@
     "@types/node": "^22.14.1",
     "jest": "^29.7.0",
     "ts-jest": "^29.3.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3"
   }
 }
