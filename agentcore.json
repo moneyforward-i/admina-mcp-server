@@ -1,0 +1,10 @@
+{
+  "agents": [
+    {
+      "name": "admina-remote-mcp",
+      "protocol": "MCP",
+      "port": 8000,
+      "requestHeaderAllowlist": []
+    }
+  ]
+}

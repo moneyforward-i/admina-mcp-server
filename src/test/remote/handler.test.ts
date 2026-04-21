@@ -45,8 +45,21 @@ afterAll((done) => {
   testServer.close(done);
 });
 
+// Capture values set by .jest.setup.js so we can restore them
+const ORIGINAL_API_KEY = process.env.ADMINA_API_KEY;
+const ORIGINAL_ORG_ID = process.env.ADMINA_ORGANIZATION_ID;
+
+beforeEach(() => {
+  // Clear env var credentials so header-based tests exercise the header path
+  delete process.env.ADMINA_API_KEY;
+  delete process.env.ADMINA_ORGANIZATION_ID;
+});
+
 afterEach(() => {
   jest.clearAllMocks();
+  // Restore env vars after each test
+  process.env.ADMINA_API_KEY = ORIGINAL_API_KEY;
+  process.env.ADMINA_ORGANIZATION_ID = ORIGINAL_ORG_ID;
 });
 
 describe("HTTP handler", () => {
@@ -157,6 +170,56 @@ describe("HTTP handler", () => {
       validateStatus: () => true,
     });
     expect(response.status).toBe(404);
+  });
+
+  // ── AgentCore / env-var credential mode ────────────────────────────────
+
+  it("POST /mcp uses env var credentials when set (AgentCore mode)", async () => {
+    process.env.ADMINA_API_KEY = "env-api-key";
+    process.env.ADMINA_ORGANIZATION_ID = "env-org-id";
+
+    const response = await axios.post(
+      `${baseUrl}/mcp`,
+      { jsonrpc: "2.0", id: 1, method: "tools/list", params: {} },
+      {
+        // No Authorization or X-Organization-ID headers — credentials come from env
+        headers: {
+          accept: "application/json, text/event-stream",
+          "content-type": "application/json",
+        },
+        validateStatus: () => true,
+      },
+    );
+
+    // Should not be rejected (401) — env vars supply the credentials
+    expect(response.status).not.toBe(401);
+    expect(response.status).toBe(200);
+  });
+
+  it("POST /mcp env var API key takes priority over Authorization header", async () => {
+    process.env.ADMINA_API_KEY = "env-api-key";
+    process.env.ADMINA_ORGANIZATION_ID = "env-org-id";
+
+    const { createRemoteMcpServer } = await import("../../remote/server.js");
+    const mockCreate = createRemoteMcpServer as jest.Mock;
+
+    const response = await axios.post(
+      `${baseUrl}/mcp`,
+      { jsonrpc: "2.0", id: 1, method: "tools/list", params: {} },
+      {
+        headers: {
+          accept: "application/json, text/event-stream",
+          authorization: "Bearer header-api-key",
+          "x-organization-id": "header-org-id",
+          "content-type": "application/json",
+        },
+        validateStatus: () => true,
+      },
+    );
+
+    expect(response.status).toBe(200);
+    // env var wins over header
+    expect(mockCreate).toHaveBeenCalledWith("env-api-key", "env-org-id");
   });
 
   it("POST /mcp with valid headers and valid JSON forwards to MCP server", async () => {

@@ -55,13 +55,23 @@ export function createHttpHandler(): (req: http.IncomingMessage, res: http.Serve
         return;
       }
 
-      // Extract caller credentials
+      // Credentials: env vars take priority (AgentCore/shared-key mode),
+      // falling back to per-request headers (ECS/per-caller mode).
       const authHeader = (req.headers["authorization"] ?? "") as string;
-      const orgId = (req.headers["x-organization-id"] ?? "") as string;
-      const apiKey = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+      const apiKey =
+        process.env.ADMINA_API_KEY ??
+        (authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "");
+      const orgId =
+        process.env.ADMINA_ORGANIZATION_ID ??
+        ((req.headers["x-organization-id"] ?? "") as string);
 
       if (!apiKey || !orgId) {
-        rejectWithError(res, 401, -32001, "Missing required headers: Authorization (Bearer token) and X-Organization-ID");
+        rejectWithError(
+          res,
+          401,
+          -32001,
+          "Missing credentials: set ADMINA_API_KEY + ADMINA_ORGANIZATION_ID env vars, or pass Authorization (Bearer) + X-Organization-ID headers",
+        );
         return;
       }
 
