@@ -3,7 +3,10 @@
 import axios, { AxiosError } from "axios";
 import type { ToolDefinition } from "./types.js";
 
-const ADMINA_API_BASE = "https://api.itmc.i.moneyforward.com/api/v1";
+// VULCAN_API_BASE_URL overrides the default public URL.
+// Set to an internal Cloud Map DNS name (e.g. http://vulcan.internal/api/v1)
+// when running in the same VPC as vulcan to avoid the public internet hop.
+const DEFAULT_API_BASE = "https://api.itmc.i.moneyforward.com/api/v1";
 
 /**
  * Proxy a single MCP tool call to the vulcan API.
@@ -63,8 +66,9 @@ export async function proxyToolCall(
   }
 
   // 4. Build full URL
+  const apiBase = process.env.VULCAN_API_BASE_URL ?? DEFAULT_API_BASE;
   const qs = queryString.toString();
-  const url = `${ADMINA_API_BASE}${resolvedPath}${qs ? `?${qs}` : ""}`;
+  const url = `${apiBase}${resolvedPath}${qs ? `?${qs}` : ""}`;
 
   // 5. Execute request
   try {

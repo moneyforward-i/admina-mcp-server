@@ -9,6 +9,11 @@ import { createRemoteMcpServer } from "./server.js";
 
 export const MAX_BODY_SIZE = 1 * 1024 * 1024; // 1 MB
 
+/** Structured JSON log — picked up by Datadog / CloudWatch log agent */
+function log(fields: Record<string, unknown>): void {
+  console.log(JSON.stringify({ ...fields, ts: new Date().toISOString() }));
+}
+
 /** Read the full request body as a string */
 export function readBody(req: http.IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -38,6 +43,11 @@ export function createHttpHandler(): (req: http.IncomingMessage, res: http.Serve
   return async (req, res) => {
     const url = req.url ?? "/";
     const method = req.method ?? "GET";
+    const startMs = Date.now();
+
+    res.on("finish", () => {
+      log({ method, path: url, status: res.statusCode, durationMs: Date.now() - startMs });
+    });
 
     // ── Health check ────────────────────────────────────────────────────────
     if (method === "GET" && url === "/healthz") {
@@ -102,7 +112,7 @@ export function createHttpHandler(): (req: http.IncomingMessage, res: http.Serve
         await mcpServer.connect(transport);
         await transport.handleRequest(req, res, parsedBody);
       } catch (error) {
-        console.error("MCP request error:", error);
+        log({ level: "error", msg: "MCP request error", orgId, error: String(error) });
         if (!res.headersSent) {
           rejectWithError(res, 500, -32603, "Internal error");
         }
