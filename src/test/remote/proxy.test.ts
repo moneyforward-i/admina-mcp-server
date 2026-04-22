@@ -64,9 +64,7 @@ describe("proxyToolCall", () => {
       description: "Create identity",
       method: "POST",
       path: "/organizations/{organizationId}/identities",
-      parameters: [
-        { name: "organizationId", in: "path", required: true },
-      ],
+      parameters: [{ name: "organizationId", in: "path", required: true }],
       hasBody: true,
       inputSchema: {
         type: "object",
@@ -101,9 +99,9 @@ describe("proxyToolCall", () => {
   });
 
   it("throws when a required path param is missing", async () => {
-    await expect(
-      proxyToolCall(BASE_TOOL, {}, "api-key", "org-1"),
-    ).rejects.toThrow(/unresolved path parameters|Missing required path parameters/i);
+    await expect(proxyToolCall(BASE_TOOL, {}, "api-key", "org-1")).rejects.toThrow(
+      /unresolved path parameters|Missing required path parameters/i,
+    );
   });
 
   it("re-throws AxiosError as a plain Error with upstream status in the message", async () => {
@@ -122,9 +120,9 @@ describe("proxyToolCall", () => {
 
     mockedAxios.mockRejectedValueOnce(axiosError);
 
-    await expect(
-      proxyToolCall(BASE_TOOL, { identityId: "x" }, "api-key", "org-1"),
-    ).rejects.toThrow("Upstream error 404");
+    await expect(proxyToolCall(BASE_TOOL, { identityId: "x" }, "api-key", "org-1")).rejects.toThrow(
+      "Upstream error 404",
+    );
   });
 
   it("sends Authorization and X-Request-Source headers", async () => {

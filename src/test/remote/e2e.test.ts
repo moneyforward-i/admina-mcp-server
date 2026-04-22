@@ -8,8 +8,8 @@
 
 import { type ChildProcess, spawn } from "node:child_process";
 import { copyFileSync, mkdirSync } from "node:fs";
-import { resolve } from "node:path";
 import http from "node:http";
+import { resolve } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
@@ -49,7 +49,11 @@ maybeDescribe("Remote MCP server e2e (requires E2E_API_KEY + E2E_ORG_ID)", () =>
   }, 20_000);
 
   afterAll(async () => {
-    try { await client?.close(); } catch { /* ignore */ }
+    try {
+      await client?.close();
+    } catch {
+      /* ignore */
+    }
     serverProcess?.kill("SIGTERM");
   });
 
@@ -82,7 +86,7 @@ maybeDescribe("Remote MCP server e2e (requires E2E_API_KEY + E2E_ORG_ID)", () =>
     expect(result.isError).toBeFalsy();
     const data = parseToolResult(result);
     // response is either an array or { data: [...] }
-    const items = Array.isArray(data) ? data : (data as Record<string, unknown>).data ?? data;
+    const items = Array.isArray(data) ? data : ((data as Record<string, unknown>).data ?? data);
     expect(items).toBeDefined();
   });
 
@@ -180,14 +184,22 @@ function waitForServer(url: string, timeoutMs: number): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   return new Promise((resolve, reject) => {
     function poll() {
-      http.get(url, (res) => {
-        res.resume();
-        if (res.statusCode === 200) { resolve(); return; }
-        retry();
-      }).on("error", retry);
+      http
+        .get(url, (res) => {
+          res.resume();
+          if (res.statusCode === 200) {
+            resolve();
+            return;
+          }
+          retry();
+        })
+        .on("error", retry);
     }
     function retry() {
-      if (Date.now() >= deadline) { reject(new Error(`Server not ready after ${timeoutMs}ms`)); return; }
+      if (Date.now() >= deadline) {
+        reject(new Error(`Server not ready after ${timeoutMs}ms`));
+        return;
+      }
       setTimeout(poll, 200);
     }
     poll();

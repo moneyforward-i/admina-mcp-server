@@ -40,6 +40,8 @@
   "files": {
     "ignore": [
       "node_modules",
+      "build",
+      "src/generated",
       ".github",
       ".git",
       ".DS_Store",

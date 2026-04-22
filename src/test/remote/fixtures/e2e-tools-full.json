@@ -65,12 +65,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "employee",
-                "guest",
-                "system",
-                "unknown"
-              ]
+              "enum": ["employee", "guest", "system", "unknown"]
             }
           }
         },
@@ -83,11 +78,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "active",
-                "suspended",
-                "on_leave"
-              ]
+              "enum": ["active", "suspended", "on_leave"]
             }
           }
         },
@@ -107,12 +98,7 @@
           "description": "Sort results by a specific field.",
           "schema": {
             "type": "string",
-            "enum": [
-              "type",
-              "nameOrAccountKey",
-              "accountCount",
-              "createdAt"
-            ]
+            "enum": ["type", "nameOrAccountKey", "accountCount", "createdAt"]
           }
         },
         {
@@ -122,10 +108,7 @@
           "description": "Sort results in ascending or descending order. Defaults to `ASC`.",
           "schema": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ]
+            "enum": ["DESC", "ASC"]
           }
         },
         {
@@ -143,11 +126,7 @@
           "required": false,
           "description": "Filter people who own some specific SaaS accounts. Accepts multiple options.",
           "schema": {
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "type": "array",
             "items": {
               "type": "number"
@@ -161,11 +140,7 @@
           "description": "Filter results by status. Note: please use `statuses` instead, this property is deprecated and will be removed in a future version.",
           "schema": {
             "type": "string",
-            "enum": [
-              "active",
-              "suspended",
-              "on_leave"
-            ]
+            "enum": ["active", "suspended", "on_leave"]
           }
         }
       ],
@@ -187,12 +162,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "employee",
-                "guest",
-                "system",
-                "unknown"
-              ]
+              "enum": ["employee", "guest", "system", "unknown"]
             },
             "description": "Filter results by type. Accepts multiple options."
           },
@@ -200,11 +170,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "active",
-                "suspended",
-                "on_leave"
-              ]
+              "enum": ["active", "suspended", "on_leave"]
             },
             "description": "Filter results by status. Accepts multiple options."
           },
@@ -214,20 +180,12 @@
           },
           "sortBy": {
             "type": "string",
-            "enum": [
-              "type",
-              "nameOrAccountKey",
-              "accountCount",
-              "createdAt"
-            ],
+            "enum": ["type", "nameOrAccountKey", "accountCount", "createdAt"],
             "description": "Sort results by a specific field."
           },
           "sortOrder": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ],
+            "enum": ["DESC", "ASC"],
             "description": "Sort results in ascending or descending order. Defaults to `ASC`."
           },
           "includePeopleWithNoAccounts": {
@@ -235,11 +193,7 @@
             "description": "By default, won't return people who have no SaaS accounts. This flag will override that behavior."
           },
           "serviceIds": {
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "type": "array",
             "items": {
               "type": "number"
@@ -248,11 +202,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "suspended",
-              "on_leave"
-            ],
+            "enum": ["active", "suspended", "on_leave"],
             "description": "Filter results by status. Note: please use `statuses` instead, this property is deprecated and will be removed in a future version."
           }
         }
@@ -289,9 +239,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "peopleId"
-        ]
+        "required": ["peopleId"]
       }
     },
     {
@@ -343,11 +291,7 @@
           "description": "Filter results by role (not all SaaS support this filter).<br/>`admin` - only SaaS admin accounts<br/>`guest` - only SaaS guest accounts<br/>`other` - SaaS accounts that are neither admin nor guest",
           "schema": {
             "type": "string",
-            "enum": [
-              "admin",
-              "guest",
-              "other"
-            ]
+            "enum": ["admin", "guest", "other"]
           }
         },
         {
@@ -374,11 +318,7 @@
           "required": false,
           "description": "Filter results by service ID. Accepts multiple options.",
           "schema": {
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "type": "array",
             "items": {
               "type": "number"
@@ -391,11 +331,7 @@
           "required": false,
           "description": "Filter results by workspace ID. Accepts multiple options.",
           "schema": {
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "type": "array",
             "items": {
               "type": "number"
@@ -409,11 +345,7 @@
           "description": "Sort results by a specific field.",
           "schema": {
             "type": "string",
-            "enum": [
-              "service",
-              "twoFa",
-              "lastActivity"
-            ]
+            "enum": ["service", "twoFa", "lastActivity"]
           }
         },
         {
@@ -423,10 +355,7 @@
           "description": "Sort results in ascending or descending order. Defaults to `ASC`.",
           "schema": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ]
+            "enum": ["DESC", "ASC"]
           }
         },
         {
@@ -435,10 +364,7 @@
           "required": false,
           "description": "Filter results by license. Accepts multiple options.",
           "schema": {
-            "example": [
-              "license1",
-              "license2"
-            ],
+            "example": ["license1", "license2"],
             "type": "array",
             "items": {
               "type": "string"
@@ -452,11 +378,7 @@
           "description": "Filter results by status.",
           "schema": {
             "type": "string",
-            "enum": [
-              "active",
-              "suspended",
-              "on_leave"
-            ]
+            "enum": ["active", "suspended", "on_leave"]
           }
         }
       ],
@@ -479,11 +401,7 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "admin",
-              "guest",
-              "other"
-            ],
+            "enum": ["admin", "guest", "other"],
             "description": "Filter results by role (not all SaaS support this filter).<br/>`admin` - only SaaS admin accounts<br/>`guest` - only SaaS guest accounts<br/>`other` - SaaS accounts that are neither admin nor guest"
           },
           "twoFa": {
@@ -495,11 +413,7 @@
             "description": "Filter results by SaaS name or workspace name (partial match supported)."
           },
           "serviceIds": {
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "type": "array",
             "items": {
               "type": "number"
@@ -507,11 +421,7 @@
             "description": "Filter results by service ID. Accepts multiple options."
           },
           "workspaceIds": {
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "type": "array",
             "items": {
               "type": "number"
@@ -520,26 +430,16 @@
           },
           "sortBy": {
             "type": "string",
-            "enum": [
-              "service",
-              "twoFa",
-              "lastActivity"
-            ],
+            "enum": ["service", "twoFa", "lastActivity"],
             "description": "Sort results by a specific field."
           },
           "sortOrder": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ],
+            "enum": ["DESC", "ASC"],
             "description": "Sort results in ascending or descending order. Defaults to `ASC`."
           },
           "licenses": {
-            "example": [
-              "license1",
-              "license2"
-            ],
+            "example": ["license1", "license2"],
             "type": "array",
             "items": {
               "type": "string"
@@ -548,17 +448,11 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "suspended",
-              "on_leave"
-            ],
+            "enum": ["active", "suspended", "on_leave"],
             "description": "Filter results by status."
           }
         },
-        "required": [
-          "peopleId"
-        ]
+        "required": ["peopleId"]
       }
     },
     {
@@ -612,12 +506,7 @@
           "description": "Sort results by a field.",
           "schema": {
             "type": "string",
-            "enum": [
-              "name",
-              "email",
-              "role",
-              "status"
-            ]
+            "enum": ["name", "email", "role", "status"]
           }
         },
         {
@@ -627,10 +516,7 @@
           "description": "Sort results in ascending or descending order. Defaults to `ASC`.",
           "schema": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ]
+            "enum": ["DESC", "ASC"]
           }
         }
       ],
@@ -655,20 +541,12 @@
           },
           "sortField": {
             "type": "string",
-            "enum": [
-              "name",
-              "email",
-              "role",
-              "status"
-            ],
+            "enum": ["name", "email", "role", "status"],
             "description": "Sort results by a field."
           },
           "order": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ],
+            "enum": ["DESC", "ASC"],
             "description": "Sort results in ascending or descending order. Defaults to `ASC`."
           }
         }
@@ -726,10 +604,7 @@
             "type": "number"
           },
           "roleIds": {
-            "example": [
-              2,
-              3
-            ],
+            "example": [2, 3],
             "description": "The list of role ids to assign to the user. Note that admin role cannot be used with other roles, and a user can not have more than 10 roles. This methods performs a full update, so all roles will be replaced with the roles in the request.",
             "type": "array",
             "items": {
@@ -737,10 +612,7 @@
             }
           }
         },
-        "required": [
-          "userId",
-          "roleIds"
-        ]
+        "required": ["userId", "roleIds"]
       }
     },
     {
@@ -793,13 +665,7 @@
           "description": "Sort results by a specific field.",
           "schema": {
             "type": "string",
-            "enum": [
-              "accountCount",
-              "serviceName",
-              "alertsCount",
-              "engagementScore",
-              "lastMonthSpending"
-            ]
+            "enum": ["accountCount", "serviceName", "alertsCount", "engagementScore", "lastMonthSpending"]
           }
         },
         {
@@ -809,10 +675,7 @@
           "description": "Sort results in ascending or descending order. Defaults to `ASC`.",
           "schema": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ]
+            "enum": ["DESC", "ASC"]
           }
         }
       ],
@@ -836,21 +699,12 @@
           },
           "sortBy": {
             "type": "string",
-            "enum": [
-              "accountCount",
-              "serviceName",
-              "alertsCount",
-              "engagementScore",
-              "lastMonthSpending"
-            ],
+            "enum": ["accountCount", "serviceName", "alertsCount", "engagementScore", "lastMonthSpending"],
             "description": "Sort results by a specific field."
           },
           "sortOrder": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ],
+            "enum": ["DESC", "ASC"],
             "description": "Sort results in ascending or descending order. Defaults to `ASC`."
           }
         }
@@ -940,10 +794,7 @@
             "description": "End date for the engagement scores calculation."
           }
         },
-        "required": [
-          "startDate",
-          "endDate"
-        ]
+        "required": ["startDate", "endDate"]
       }
     },
     {
@@ -967,11 +818,7 @@
           "description": "Sort results by a specific field.",
           "schema": {
             "type": "string",
-            "enum": [
-              "retiredAccounts",
-              "inactiveAccounts",
-              "services"
-            ]
+            "enum": ["retiredAccounts", "inactiveAccounts", "services"]
           }
         },
         {
@@ -981,10 +828,7 @@
           "description": "Sort results in ascending or descending order. Defaults to `ASC`.",
           "schema": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ]
+            "enum": ["DESC", "ASC"]
           }
         }
       ],
@@ -994,19 +838,12 @@
         "properties": {
           "sortBy": {
             "type": "string",
-            "enum": [
-              "retiredAccounts",
-              "inactiveAccounts",
-              "services"
-            ],
+            "enum": ["retiredAccounts", "inactiveAccounts", "services"],
             "description": "Sort results by a specific field."
           },
           "sortOrder": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ],
+            "enum": ["DESC", "ASC"],
             "description": "Sort results in ascending or descending order. Defaults to `ASC`."
           }
         }
@@ -1070,11 +907,7 @@
           "description": "Sort results by a specific field.",
           "schema": {
             "type": "string",
-            "enum": [
-              "service",
-              "twoFa",
-              "lastActivity"
-            ]
+            "enum": ["service", "twoFa", "lastActivity"]
           }
         },
         {
@@ -1084,10 +917,7 @@
           "description": "Sort results in ascending or descending order. Defaults to `ASC`.",
           "schema": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ]
+            "enum": ["DESC", "ASC"]
           }
         },
         {
@@ -1096,9 +926,7 @@
           "required": false,
           "description": "Filter results by workspaceIds. Accepts multiple options.",
           "schema": {
-            "example": [
-              1
-            ],
+            "example": [1],
             "type": "array",
             "items": {
               "type": "number"
@@ -1123,11 +951,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "admin",
-                "guest",
-                "other"
-              ]
+              "enum": ["admin", "guest", "other"]
             }
           }
         },
@@ -1137,10 +961,7 @@
           "required": false,
           "description": "Filter results by role in the SaaS. Accepts multiple options.",
           "schema": {
-            "example": [
-              "role1",
-              "role2"
-            ],
+            "example": ["role1", "role2"],
             "type": "array",
             "items": {
               "type": "string"
@@ -1156,12 +977,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "employee",
-                "guest",
-                "system",
-                "unknown"
-              ]
+              "enum": ["employee", "guest", "system", "unknown"]
             }
           }
         },
@@ -1202,11 +1018,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "active",
-                "suspended",
-                "on_leave"
-              ]
+              "enum": ["active", "suspended", "on_leave"]
             }
           }
         },
@@ -1219,14 +1031,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "active",
-                "on_leave",
-                "draft",
-                "preactive",
-                "retired",
-                "untracked"
-              ]
+              "enum": ["active", "on_leave", "draft", "preactive", "retired", "untracked"]
             }
           }
         },
@@ -1263,10 +1068,7 @@
           "required": false,
           "description": "Filter results by license. Accepts multiple options.",
           "schema": {
-            "example": [
-              "license1",
-              "license2"
-            ],
+            "example": ["license1", "license2"],
             "type": "array",
             "items": {
               "type": "string"
@@ -1280,13 +1082,7 @@
           "description": "Filter results by alert type. Required when `alertStatus` is set.",
           "schema": {
             "type": "string",
-            "enum": [
-              "retired_account",
-              "inactive_account",
-              "on_leave_account",
-              "unknown_account",
-              "public_files"
-            ]
+            "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"]
           }
         },
         {
@@ -1296,10 +1092,7 @@
           "description": "Filter results by alert status.",
           "schema": {
             "type": "string",
-            "enum": [
-              "muted",
-              "unmuted"
-            ]
+            "enum": ["muted", "unmuted"]
           }
         },
         {
@@ -1327,11 +1120,7 @@
           "description": "Filter results by status. Note: please use `statuses` instead, this property is deprecated and will be removed in a future version.",
           "schema": {
             "type": "string",
-            "enum": [
-              "active",
-              "suspended",
-              "on_leave"
-            ]
+            "enum": ["active", "suspended", "on_leave"]
           }
         }
       ],
@@ -1358,25 +1147,16 @@
           },
           "sortBy": {
             "type": "string",
-            "enum": [
-              "service",
-              "twoFa",
-              "lastActivity"
-            ],
+            "enum": ["service", "twoFa", "lastActivity"],
             "description": "Sort results by a specific field."
           },
           "sortOrder": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ],
+            "enum": ["DESC", "ASC"],
             "description": "Sort results in ascending or descending order. Defaults to `ASC`."
           },
           "workspaceIds": {
-            "example": [
-              1
-            ],
+            "example": [1],
             "type": "array",
             "items": {
               "type": "number"
@@ -1391,19 +1171,12 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "admin",
-                "guest",
-                "other"
-              ]
+              "enum": ["admin", "guest", "other"]
             },
             "description": "Filter results by role (not all SaaS support this filter).<br/>`admin` - only SaaS admin accounts<br/>`guest` - only SaaS guest accounts<br/>`other` - SaaS accounts that are neither admin nor guest. Accepts multiple options."
           },
           "serviceRoles": {
-            "example": [
-              "role1",
-              "role2"
-            ],
+            "example": ["role1", "role2"],
             "type": "array",
             "items": {
               "type": "string"
@@ -1414,12 +1187,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "employee",
-                "guest",
-                "system",
-                "unknown"
-              ]
+              "enum": ["employee", "guest", "system", "unknown"]
             },
             "description": "Filter results by type. Accepts multiple options."
           },
@@ -1450,11 +1218,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "active",
-                "suspended",
-                "on_leave"
-              ]
+              "enum": ["active", "suspended", "on_leave"]
             },
             "description": "Filter results by status. Accepts multiple options."
           },
@@ -1462,14 +1226,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "active",
-                "on_leave",
-                "draft",
-                "preactive",
-                "retired",
-                "untracked"
-              ]
+              "enum": ["active", "on_leave", "draft", "preactive", "retired", "untracked"]
             },
             "description": "Filter results by type. Accepts multiple options."
           },
@@ -1486,10 +1243,7 @@
             "description": "Show accounts that have been inactive for a while"
           },
           "licenses": {
-            "example": [
-              "license1",
-              "license2"
-            ],
+            "example": ["license1", "license2"],
             "type": "array",
             "items": {
               "type": "string"
@@ -1498,21 +1252,12 @@
           },
           "alertType": {
             "type": "string",
-            "enum": [
-              "retired_account",
-              "inactive_account",
-              "on_leave_account",
-              "unknown_account",
-              "public_files"
-            ],
+            "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"],
             "description": "Filter results by alert type. Required when `alertStatus` is set."
           },
           "alertStatus": {
             "type": "string",
-            "enum": [
-              "muted",
-              "unmuted"
-            ],
+            "enum": ["muted", "unmuted"],
             "description": "Filter results by alert status."
           },
           "includeAccountMemo": {
@@ -1525,17 +1270,11 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "active",
-              "suspended",
-              "on_leave"
-            ],
+            "enum": ["active", "suspended", "on_leave"],
             "description": "Filter results by status. Note: please use `statuses` instead, this property is deprecated and will be removed in a future version."
           }
         },
-        "required": [
-          "serviceId"
-        ]
+        "required": ["serviceId"]
       }
     },
     {
@@ -1584,11 +1323,7 @@
             "example": "This account belongs to Jessica"
           }
         },
-        "required": [
-          "serviceId",
-          "accountId",
-          "memo"
-        ]
+        "required": ["serviceId", "accountId", "memo"]
       }
     },
     {
@@ -1633,10 +1368,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "serviceId",
-          "accountId"
-        ]
+        "required": ["serviceId", "accountId"]
       }
     },
     {
@@ -1697,11 +1429,7 @@
           "description": "Filter results by sharing status.",
           "schema": {
             "type": "string",
-            "enum": [
-              "public",
-              "internal",
-              "shared"
-            ]
+            "enum": ["public", "internal", "shared"]
           }
         },
         {
@@ -1711,10 +1439,7 @@
           "description": "Filter results by file type.",
           "schema": {
             "type": "string",
-            "enum": [
-              "file",
-              "folder"
-            ]
+            "enum": ["file", "folder"]
           }
         },
         {
@@ -1723,10 +1448,7 @@
           "required": false,
           "description": "Filter results by owners.",
           "schema": {
-            "example": [
-              "John Doe",
-              "Jane Doe"
-            ],
+            "example": ["John Doe", "Jane Doe"],
             "type": "array",
             "items": {
               "type": "string"
@@ -1740,15 +1462,7 @@
           "description": "Sort results by a field.",
           "schema": {
             "type": "string",
-            "enum": [
-              "fileName",
-              "fileType",
-              "source",
-              "sharingStatus",
-              "creationDate",
-              "workspaceId",
-              "workspaceName"
-            ]
+            "enum": ["fileName", "fileType", "source", "sharingStatus", "creationDate", "workspaceId", "workspaceName"]
           }
         },
         {
@@ -1758,10 +1472,7 @@
           "description": "Sort results in ascending or descending order. Defaults to `ASC`.",
           "schema": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ]
+            "enum": ["DESC", "ASC"]
           }
         },
         {
@@ -1798,26 +1509,16 @@
           },
           "sharingStatus": {
             "type": "string",
-            "enum": [
-              "public",
-              "internal",
-              "shared"
-            ],
+            "enum": ["public", "internal", "shared"],
             "description": "Filter results by sharing status."
           },
           "fileType": {
             "type": "string",
-            "enum": [
-              "file",
-              "folder"
-            ],
+            "enum": ["file", "folder"],
             "description": "Filter results by file type."
           },
           "owners": {
-            "example": [
-              "John Doe",
-              "Jane Doe"
-            ],
+            "example": ["John Doe", "Jane Doe"],
             "type": "array",
             "items": {
               "type": "string"
@@ -1826,23 +1527,12 @@
           },
           "sortBy": {
             "type": "string",
-            "enum": [
-              "fileName",
-              "fileType",
-              "source",
-              "sharingStatus",
-              "creationDate",
-              "workspaceId",
-              "workspaceName"
-            ],
+            "enum": ["fileName", "fileType", "source", "sharingStatus", "creationDate", "workspaceId", "workspaceName"],
             "description": "Sort results by a field."
           },
           "sortOrder": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ],
+            "enum": ["DESC", "ASC"],
             "description": "Sort results in ascending or descending order. Defaults to `ASC`."
           },
           "workspaceId": {
@@ -1851,9 +1541,7 @@
             "description": "Filter results by workspace ID."
           }
         },
-        "required": [
-          "serviceId"
-        ]
+        "required": ["serviceId"]
       }
     },
     {
@@ -1887,9 +1575,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "serviceId"
-        ]
+        "required": ["serviceId"]
       }
     },
     {
@@ -2039,9 +1725,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "workspaceId"
-        ]
+        "required": ["workspaceId"]
       }
     },
     {
@@ -2075,9 +1759,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "workspaceId"
-        ]
+        "required": ["workspaceId"]
       }
     },
     {
@@ -2132,9 +1814,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "workspaceId"
-        ]
+        "required": ["workspaceId"]
       }
     },
     {
@@ -2165,10 +1845,7 @@
           "required": false,
           "schema": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ]
+            "enum": ["en", "ja"]
           }
         }
       ],
@@ -2181,15 +1858,10 @@
           },
           "lang": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ]
+            "enum": ["en", "ja"]
           }
         },
-        "required": [
-          "workspaceId"
-        ]
+        "required": ["workspaceId"]
       }
     },
     {
@@ -2258,10 +1930,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "workspaceId",
-          "fileId"
-        ]
+        "required": ["workspaceId", "fileId"]
       }
     },
     {
@@ -2463,10 +2132,7 @@
             "description": "Filter spends by end date."
           }
         },
-        "required": [
-          "startDate",
-          "endDate"
-        ]
+        "required": ["startDate", "endDate"]
       }
     },
     {
@@ -2515,17 +2181,11 @@
                   "example": "Dropbox yearly subscription"
                 }
               },
-              "required": [
-                "date",
-                "amount",
-                "currency"
-              ]
+              "required": ["date", "amount", "currency"]
             }
           }
         },
-        "required": [
-          "data"
-        ]
+        "required": ["data"]
       }
     },
     {
@@ -2846,9 +2506,7 @@
                   "description": "The two factor authentication status of the account."
                 }
               },
-              "required": [
-                "email"
-              ]
+              "required": ["email"]
             }
           },
           "update": {
@@ -2889,9 +2547,7 @@
                   "description": "The two factor authentication status of the account."
                 }
               },
-              "required": [
-                "email"
-              ]
+              "required": ["email"]
             }
           },
           "delete": {
@@ -2932,18 +2588,11 @@
                   "description": "The two factor authentication status of the account."
                 }
               },
-              "required": [
-                "email"
-              ]
+              "required": ["email"]
             }
           }
         },
-        "required": [
-          "workspaceId",
-          "create",
-          "update",
-          "delete"
-        ]
+        "required": ["workspaceId", "create", "update", "delete"]
       }
     },
     {
@@ -2974,10 +2623,7 @@
           "required": false,
           "schema": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ]
+            "enum": ["en", "ja"]
           }
         }
       ],
@@ -2990,10 +2636,7 @@
           },
           "lang": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ]
+            "enum": ["en", "ja"]
           },
           "data": {
             "oneOf": [
@@ -3009,10 +2652,7 @@
             ],
             "example": {
               "provisioningType": "invite",
-              "licenses": [
-                "license1",
-                "license2"
-              ]
+              "licenses": ["license1", "license2"]
             },
             "description": "\nTo create an account for a workspace, following are the steps:\n\n- **Step 1**: `GET /workspaces/:workspaceId/provisioning-meta` This returns a list of fields.\n- **Step 2**: `POST /workspaces/:workspaceId/accounts` Make a request based on the meta response from the previous step.\n- **Step 3**: `GET /requests/:requestId` Use requestId from previous step to check status\n\nContinue polling this API until status changes to “finished” or “failed”. There will be a rate limit on this API, so please use an interval of 1s.\n  "
           },
@@ -3023,10 +2663,7 @@
             "description": "The ID of the workflow run."
           }
         },
-        "required": [
-          "workspaceId",
-          "data"
-        ]
+        "required": ["workspaceId", "data"]
       }
     },
     {
@@ -3080,9 +2717,7 @@
           "description": "The type of the resource.",
           "schema": {
             "type": "string",
-            "enum": [
-              "datadog-infrastructure-host"
-            ]
+            "enum": ["datadog-infrastructure-host"]
           }
         },
         {
@@ -3117,9 +2752,7 @@
           },
           "resourceType": {
             "type": "string",
-            "enum": [
-              "datadog-infrastructure-host"
-            ],
+            "enum": ["datadog-infrastructure-host"],
             "description": "The type of the resource."
           },
           "workspaceId": {
@@ -3180,10 +2813,7 @@
           "description": "Sort order for the results (asc or desc)",
           "schema": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ]
+            "enum": ["DESC", "ASC"]
           }
         },
         {
@@ -3195,10 +2825,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "relatedIdentity",
-                "customFieldsMetadata"
-              ]
+              "enum": ["relatedIdentity", "customFieldsMetadata"]
             }
           }
         }
@@ -3223,20 +2850,14 @@
           },
           "sortOrder": {
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ],
+            "enum": ["DESC", "ASC"],
             "description": "Sort order for the results (asc or desc)"
           },
           "expands": {
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "relatedIdentity",
-                "customFieldsMetadata"
-              ]
+              "enum": ["relatedIdentity", "customFieldsMetadata"]
             },
             "description": "Expand other datasets when fetching devices. Accepts multiple options."
           },
@@ -3324,10 +2945,7 @@
           "description": "Translate the field names and labels to the specified locale.",
           "schema": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ]
+            "enum": ["en", "ja"]
           }
         },
         {
@@ -3337,11 +2955,7 @@
           "description": "Filter by device type.",
           "schema": {
             "type": "string",
-            "enum": [
-              "pc",
-              "phone",
-              "other"
-            ]
+            "enum": ["pc", "phone", "other"]
           }
         },
         {
@@ -3351,15 +2965,7 @@
           "description": "Filter by device status.",
           "schema": {
             "type": "string",
-            "enum": [
-              "in_stock",
-              "pre_use",
-              "active",
-              "missing",
-              "malfunction",
-              "decommissioned",
-              "on_order"
-            ]
+            "enum": ["in_stock", "pre_use", "active", "missing", "malfunction", "decommissioned", "on_order"]
           }
         },
         {
@@ -3411,10 +3017,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "relatedIdentity",
-                "customFieldsMetadata"
-              ]
+              "enum": ["relatedIdentity", "customFieldsMetadata"]
             }
           }
         }
@@ -3435,32 +3038,17 @@
           },
           "locale": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ],
+            "enum": ["en", "ja"],
             "description": "Translate the field names and labels to the specified locale."
           },
           "type": {
             "type": "string",
-            "enum": [
-              "pc",
-              "phone",
-              "other"
-            ],
+            "enum": ["pc", "phone", "other"],
             "description": "Filter by device type."
           },
           "status": {
             "type": "string",
-            "enum": [
-              "in_stock",
-              "pre_use",
-              "active",
-              "missing",
-              "malfunction",
-              "decommissioned",
-              "on_order"
-            ],
+            "enum": ["in_stock", "pre_use", "active", "missing", "malfunction", "decommissioned", "on_order"],
             "description": "Filter by device status."
           },
           "asset_number": {
@@ -3487,17 +3075,12 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "relatedIdentity",
-                "customFieldsMetadata"
-              ]
+              "enum": ["relatedIdentity", "customFieldsMetadata"]
             },
             "description": "Expand other datasets when fetching devices. Accepts multiple options."
           }
         },
-        "required": [
-          "locale"
-        ]
+        "required": ["locale"]
       }
     },
     {
@@ -3586,12 +3169,7 @@
               },
               "preset.procurement_method": {
                 "type": "string",
-                "enum": [
-                  "purchase",
-                  "lease",
-                  "rental",
-                  "other"
-                ],
+                "enum": ["purchase", "lease", "rental", "other"],
                 "example": "purchase"
               },
               "preset.purchase_date": {
@@ -3619,10 +3197,7 @@
               },
               "preset.fixed_asset": {
                 "type": "string",
-                "enum": [
-                  "yes",
-                  "no"
-                ],
+                "enum": ["yes", "no"],
                 "example": "yes"
               },
               "preset.phone_number": {
@@ -3647,12 +3222,7 @@
               },
               "preset.keyboard_layout": {
                 "type": "string",
-                "enum": [
-                  "us",
-                  "uk",
-                  "jis",
-                  "other"
-                ],
+                "enum": ["us", "uk", "jis", "other"],
                 "example": "us"
               },
               "preset.usage_start_date": {
@@ -3683,20 +3253,14 @@
               },
               "custom.custom_dropdown_field": {
                 "type": "string",
-                "enum": [
-                  "Option Displayed Value A",
-                  "Option Displayed Value B",
-                  "Option Displayed Value C"
-                ],
+                "enum": ["Option Displayed Value A", "Option Displayed Value B", "Option Displayed Value C"],
                 "example": "Option Displayed Value A",
                 "description": "This is an example of dropdown field. Please refer to `GET /api/v1alpha/organizations/{organizationId}/devices/fields/all` to get the list of all available custom fields.."
               }
             }
           }
         },
-        "required": [
-          "fields"
-        ]
+        "required": ["fields"]
       }
     },
     {
@@ -3719,11 +3283,7 @@
         "type": "object",
         "properties": {
           "deviceIds": {
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "description": "Array of device IDs to delete. Maximum 100 IDs per request.",
             "type": "array",
             "items": {
@@ -3731,9 +3291,7 @@
             }
           }
         },
-        "required": [
-          "deviceIds"
-        ]
+        "required": ["deviceIds"]
       }
     },
     {
@@ -3828,12 +3386,7 @@
                     },
                     "preset.procurement_method": {
                       "type": "string",
-                      "enum": [
-                        "purchase",
-                        "lease",
-                        "rental",
-                        "other"
-                      ],
+                      "enum": ["purchase", "lease", "rental", "other"],
                       "example": "purchase"
                     },
                     "preset.purchase_date": {
@@ -3861,10 +3414,7 @@
                     },
                     "preset.fixed_asset": {
                       "type": "string",
-                      "enum": [
-                        "yes",
-                        "no"
-                      ],
+                      "enum": ["yes", "no"],
                       "example": "yes"
                     },
                     "preset.phone_number": {
@@ -3889,12 +3439,7 @@
                     },
                     "preset.keyboard_layout": {
                       "type": "string",
-                      "enum": [
-                        "us",
-                        "uk",
-                        "jis",
-                        "other"
-                      ],
+                      "enum": ["us", "uk", "jis", "other"],
                       "example": "us"
                     },
                     "preset.usage_start_date": {
@@ -3925,26 +3470,18 @@
                     },
                     "custom.custom_dropdown_field": {
                       "type": "string",
-                      "enum": [
-                        "Option Displayed Value A",
-                        "Option Displayed Value B",
-                        "Option Displayed Value C"
-                      ],
+                      "enum": ["Option Displayed Value A", "Option Displayed Value B", "Option Displayed Value C"],
                       "example": "Option Displayed Value A",
                       "description": "This is an example of dropdown field. Please refer to `GET /api/v1alpha/organizations/{organizationId}/devices/fields/all` to get the list of all available custom fields.."
                     }
                   }
                 }
               },
-              "required": [
-                "fields"
-              ]
+              "required": ["fields"]
             }
           }
         },
-        "required": [
-          "devices"
-        ]
+        "required": ["devices"]
       }
     },
     {
@@ -4044,12 +3581,7 @@
               },
               "preset.procurement_method": {
                 "type": "string",
-                "enum": [
-                  "purchase",
-                  "lease",
-                  "rental",
-                  "other"
-                ],
+                "enum": ["purchase", "lease", "rental", "other"],
                 "example": "purchase"
               },
               "preset.purchase_date": {
@@ -4077,10 +3609,7 @@
               },
               "preset.fixed_asset": {
                 "type": "string",
-                "enum": [
-                  "yes",
-                  "no"
-                ],
+                "enum": ["yes", "no"],
                 "example": "yes"
               },
               "preset.phone_number": {
@@ -4105,12 +3634,7 @@
               },
               "preset.keyboard_layout": {
                 "type": "string",
-                "enum": [
-                  "us",
-                  "uk",
-                  "jis",
-                  "other"
-                ],
+                "enum": ["us", "uk", "jis", "other"],
                 "example": "us"
               },
               "preset.usage_start_date": {
@@ -4141,21 +3665,14 @@
               },
               "custom.custom_dropdown_field": {
                 "type": "string",
-                "enum": [
-                  "Option Displayed Value A",
-                  "Option Displayed Value B",
-                  "Option Displayed Value C"
-                ],
+                "enum": ["Option Displayed Value A", "Option Displayed Value B", "Option Displayed Value C"],
                 "example": "Option Displayed Value A",
                 "description": "This is an example of dropdown field. Please refer to `GET /api/v1alpha/organizations/{organizationId}/devices/fields/all` to get the list of all available custom fields.."
               }
             }
           }
         },
-        "required": [
-          "deviceId",
-          "fields"
-        ]
+        "required": ["deviceId", "fields"]
       }
     },
     {
@@ -4178,11 +3695,7 @@
           "required": false,
           "schema": {
             "type": "string",
-            "enum": [
-              "pc",
-              "phone",
-              "other"
-            ]
+            "enum": ["pc", "phone", "other"]
           }
         }
       ],
@@ -4192,11 +3705,7 @@
         "properties": {
           "type": {
             "type": "string",
-            "enum": [
-              "pc",
-              "phone",
-              "other"
-            ]
+            "enum": ["pc", "phone", "other"]
           }
         }
       }
@@ -4266,11 +3775,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "pc",
-                "phone",
-                "other"
-              ]
+              "enum": ["pc", "phone", "other"]
             }
           }
         }
@@ -4321,11 +3826,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "pc",
-                "phone",
-                "other"
-              ]
+              "enum": ["pc", "phone", "other"]
             }
           }
         }
@@ -4435,11 +3936,7 @@
             "description": "Unique identifier for the custom field. Must contain only lowercase letters, numbers, and underscores. If not provided, will be auto-generated."
           }
         },
-        "required": [
-          "kind",
-          "configuration",
-          "attributeName"
-        ]
+        "required": ["kind", "configuration", "attributeName"]
       }
     },
     {
@@ -4477,11 +3974,7 @@
             "example": "phone",
             "items": {
               "type": "string",
-              "enum": [
-                "pc",
-                "phone",
-                "other"
-              ]
+              "enum": ["pc", "phone", "other"]
             }
           },
           "configuration": {
@@ -4503,9 +3996,7 @@
             "description": "Unique identifier for the custom field. Must contain only lowercase letters, numbers, and underscores. Cannot be changed to a value that already exists in the organization."
           }
         },
-        "required": [
-          "customFieldId"
-        ]
+        "required": ["customFieldId"]
       }
     },
     {
@@ -4539,9 +4030,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "customFieldId"
-        ]
+        "required": ["customFieldId"]
       }
     },
     {
@@ -4650,13 +4139,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "managed",
-                "external",
-                "system",
-                "unknown",
-                "unregistered"
-              ]
+              "enum": ["managed", "external", "system", "unknown", "unregistered"]
             }
           }
         },
@@ -4697,15 +4180,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "active",
-                "on_leave",
-                "draft",
-                "preactive",
-                "retired",
-                "untracked",
-                "archived"
-              ],
+              "enum": ["active", "on_leave", "draft", "preactive", "retired", "untracked", "archived"],
               "description": "Extended status of the employee"
             }
           }
@@ -4716,10 +4191,7 @@
           "required": false,
           "description": "Filter results by companies. Accepts multiple options.",
           "schema": {
-            "example": [
-              "Corp 1",
-              "Corp 2"
-            ],
+            "example": ["Corp 1", "Corp 2"],
             "type": "array",
             "items": {
               "type": "string"
@@ -4732,10 +4204,7 @@
           "required": false,
           "description": "Filter results by departments. Accepts multiple options.",
           "schema": {
-            "example": [
-              "Sales",
-              "Marketing"
-            ],
+            "example": ["Sales", "Marketing"],
             "type": "array",
             "items": {
               "type": "string"
@@ -4748,10 +4217,7 @@
           "required": false,
           "description": "Filter results by locations. Accepts multiple options.",
           "schema": {
-            "example": [
-              "Tokyo",
-              "London"
-            ],
+            "example": ["Tokyo", "London"],
             "type": "array",
             "items": {
               "type": "string"
@@ -4844,10 +4310,7 @@
           "schema": {
             "example": "ASC",
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ]
+            "enum": ["DESC", "ASC"]
           }
         },
         {
@@ -4859,12 +4322,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "devices",
-                "accounts",
-                "customFieldsMetadata",
-                "relatedIdentity"
-              ]
+              "enum": ["devices", "accounts", "customFieldsMetadata", "relatedIdentity"]
             }
           }
         },
@@ -4877,13 +4335,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "retired_account",
-                "inactive_account",
-                "on_leave_account",
-                "unknown_account",
-                "public_files"
-              ]
+              "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"]
             }
           }
         },
@@ -4956,13 +4408,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "managed",
-                "external",
-                "system",
-                "unknown",
-                "unregistered"
-              ]
+              "enum": ["managed", "external", "system", "unknown", "unregistered"]
             },
             "description": "Filter results by management type. Accepts multiple options."
           },
@@ -4993,24 +4439,13 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "active",
-                "on_leave",
-                "draft",
-                "preactive",
-                "retired",
-                "untracked",
-                "archived"
-              ],
+              "enum": ["active", "on_leave", "draft", "preactive", "retired", "untracked", "archived"],
               "description": "Extended status of the employee"
             },
             "description": "Filter results by status. Accepts multiple options."
           },
           "companies": {
-            "example": [
-              "Corp 1",
-              "Corp 2"
-            ],
+            "example": ["Corp 1", "Corp 2"],
             "type": "array",
             "items": {
               "type": "string"
@@ -5018,10 +4453,7 @@
             "description": "Filter results by companies. Accepts multiple options."
           },
           "departments": {
-            "example": [
-              "Sales",
-              "Marketing"
-            ],
+            "example": ["Sales", "Marketing"],
             "type": "array",
             "items": {
               "type": "string"
@@ -5029,10 +4461,7 @@
             "description": "Filter results by departments. Accepts multiple options."
           },
           "locations": {
-            "example": [
-              "Tokyo",
-              "London"
-            ],
+            "example": ["Tokyo", "London"],
             "type": "array",
             "items": {
               "type": "string"
@@ -5090,22 +4519,14 @@
           "sortOrder": {
             "example": "ASC",
             "type": "string",
-            "enum": [
-              "DESC",
-              "ASC"
-            ],
+            "enum": ["DESC", "ASC"],
             "description": "Sort results in ascending or descending order. Defaults to `ASC`."
           },
           "expands": {
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "devices",
-                "accounts",
-                "customFieldsMetadata",
-                "relatedIdentity"
-              ]
+              "enum": ["devices", "accounts", "customFieldsMetadata", "relatedIdentity"]
             },
             "description": "Expand other datasets when fetching identities. Accepts multiple options."
           },
@@ -5113,13 +4534,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "retired_account",
-                "inactive_account",
-                "on_leave_account",
-                "unknown_account",
-                "public_files"
-              ]
+              "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"]
             },
             "description": "Filter result by alert type. Accepts multiple options."
           },
@@ -5207,10 +4622,7 @@
             "nullable": true
           },
           "secondaryEmails": {
-            "example": [
-              "secondary+1@email.com",
-              "secondary+2@email.com"
-            ],
+            "example": ["secondary+1@email.com", "secondary+2@email.com"],
             "description": "Secondary emails of the employee",
             "nullable": true,
             "type": "array",
@@ -5316,12 +4728,7 @@
             }
           }
         },
-        "required": [
-          "employeeStatus",
-          "employeeType",
-          "firstName",
-          "lastName"
-        ]
+        "required": ["employeeStatus", "employeeType", "firstName", "lastName"]
       }
     },
     {
@@ -5448,9 +4855,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "identityId"
-        ]
+        "required": ["identityId"]
       }
     },
     {
@@ -5484,9 +4889,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "identityId"
-        ]
+        "required": ["identityId"]
       }
     },
     {
@@ -5520,9 +4923,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "identityId"
-        ]
+        "required": ["identityId"]
       }
     },
     {
@@ -5546,10 +4947,7 @@
         "properties": {
           "identityIds": {
             "description": "Array of identity IDs to update",
-            "example": [
-              "identity-1",
-              "identity-2"
-            ],
+            "example": ["identity-1", "identity-2"],
             "type": "array",
             "items": {
               "type": "string"
@@ -5612,10 +5010,7 @@
                 "nullable": true
               },
               "secondaryEmails": {
-                "example": [
-                  "secondary+1@email.com",
-                  "secondary+2@email.com"
-                ],
+                "example": ["secondary+1@email.com", "secondary+2@email.com"],
                 "description": "Secondary emails of the employee",
                 "nullable": true,
                 "type": "array",
@@ -5673,10 +5068,7 @@
                       "properties": {}
                     }
                   },
-                  "required": [
-                    "amount",
-                    "currency"
-                  ]
+                  "required": ["amount", "currency"]
                 }
               },
               "createdAt": {
@@ -5913,12 +5305,7 @@
                       "example": "foo"
                     }
                   },
-                  "required": [
-                    "id",
-                    "attributeCode",
-                    "attributeName",
-                    "value"
-                  ]
+                  "required": ["id", "attributeCode", "attributeName", "value"]
                 }
               },
               "structuresInfo": {
@@ -5941,10 +5328,7 @@
                           "example": "name"
                         }
                       },
-                      "required": [
-                        "id",
-                        "name"
-                      ]
+                      "required": ["id", "name"]
                     }
                   },
                   "departments": {
@@ -5964,10 +5348,7 @@
                           "example": "name"
                         }
                       },
-                      "required": [
-                        "id",
-                        "name"
-                      ]
+                      "required": ["id", "name"]
                     }
                   },
                   "locations": {
@@ -5987,10 +5368,7 @@
                           "example": "name"
                         }
                       },
-                      "required": [
-                        "id",
-                        "name"
-                      ]
+                      "required": ["id", "name"]
                     }
                   },
                   "managers": {
@@ -6016,29 +5394,16 @@
                           "description": "Avatar URL"
                         }
                       },
-                      "required": [
-                        "id",
-                        "displayName",
-                        "primaryEmail",
-                        "avatar"
-                      ]
+                      "required": ["id", "displayName", "primaryEmail", "avatar"]
                     }
                   }
                 },
-                "required": [
-                  "companies",
-                  "departments",
-                  "locations",
-                  "managers"
-                ]
+                "required": ["companies", "departments", "locations", "managers"]
               }
             }
           }
         },
-        "required": [
-          "identityIds",
-          "identityUpdates"
-        ]
+        "required": ["identityIds", "identityUpdates"]
       }
     },
     {
@@ -6074,16 +5439,11 @@
                   "example": 2
                 }
               },
-              "required": [
-                "fromPeopleId",
-                "toPeopleId"
-              ]
+              "required": ["fromPeopleId", "toPeopleId"]
             }
           }
         },
-        "required": [
-          "merges"
-        ]
+        "required": ["merges"]
       }
     },
     {
@@ -6106,11 +5466,7 @@
         "type": "object",
         "properties": {
           "peopleIds": {
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "description": "List of people IDs to unmerge.",
             "type": "array",
             "items": {
@@ -6118,11 +5474,7 @@
             }
           },
           "identityIds": {
-            "example": [
-              "identity-1",
-              "identity-2",
-              "identity-3"
-            ],
+            "example": ["identity-1", "identity-2", "identity-3"],
             "description": "List of identity IDs to unmerge.",
             "type": "array",
             "items": {
@@ -6163,9 +5515,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "customFieldsMetadata"
-              ]
+              "enum": ["customFieldsMetadata"]
             }
           }
         }
@@ -6181,16 +5531,12 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": [
-                "customFieldsMetadata"
-              ]
+              "enum": ["customFieldsMetadata"]
             },
             "description": "Expand other datasets when fetching identities. Accepts multiple options."
           }
         },
-        "required": [
-          "identityId"
-        ]
+        "required": ["identityId"]
       }
     },
     {
@@ -6260,10 +5606,7 @@
             "nullable": true
           },
           "secondaryEmails": {
-            "example": [
-              "secondary+1@email.com",
-              "secondary+2@email.com"
-            ],
+            "example": ["secondary+1@email.com", "secondary+2@email.com"],
             "description": "Secondary emails of the employee",
             "nullable": true,
             "type": "array",
@@ -6369,13 +5712,7 @@
             }
           }
         },
-        "required": [
-          "identityId",
-          "employeeStatus",
-          "employeeType",
-          "firstName",
-          "lastName"
-        ]
+        "required": ["identityId", "employeeStatus", "employeeType", "firstName", "lastName"]
       }
     },
     {
@@ -6409,9 +5746,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "identityId"
-        ]
+        "required": ["identityId"]
       }
     },
     {
@@ -6478,10 +5813,7 @@
                 "example": 1
               }
             },
-            "required": [
-              "serviceFieldId",
-              "workspaceId"
-            ]
+            "required": ["serviceFieldId", "workspaceId"]
           },
           "attributeName": {
             "type": "string",
@@ -6493,11 +5825,7 @@
             "description": "Unique identifier for the custom field. Must contain only lowercase letters, numbers, and underscores. If not provided, will be auto-generated."
           }
         },
-        "required": [
-          "kind",
-          "configuration",
-          "attributeName"
-        ]
+        "required": ["kind", "configuration", "attributeName"]
       }
     },
     {
@@ -6540,9 +5868,7 @@
             "description": "Unique identifier for the custom field. Must contain only lowercase letters, numbers, and underscores. Cannot be changed to a value that already exists in the organization."
           }
         },
-        "required": [
-          "customFieldId"
-        ]
+        "required": ["customFieldId"]
       }
     },
     {
@@ -6576,9 +5902,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "customFieldId"
-        ]
+        "required": ["customFieldId"]
       }
     },
     {
@@ -6601,10 +5925,7 @@
           "required": false,
           "schema": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ]
+            "enum": ["en", "ja"]
           }
         }
       ],
@@ -6614,10 +5935,7 @@
         "properties": {
           "lang": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ]
+            "enum": ["en", "ja"]
           }
         }
       }
@@ -6659,15 +5977,10 @@
                 "type": "object"
               }
             },
-            "required": [
-              "type",
-              "id"
-            ]
+            "required": ["type", "id"]
           }
         },
-        "required": [
-          "account"
-        ]
+        "required": ["account"]
       }
     },
     {
@@ -6710,10 +6023,7 @@
           "required": false,
           "schema": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ]
+            "enum": ["en", "ja"]
           }
         },
         {
@@ -6722,11 +6032,7 @@
           "required": false,
           "schema": {
             "type": "string",
-            "enum": [
-              "user",
-              "system",
-              "api"
-            ]
+            "enum": ["user", "system", "api"]
           }
         },
         {
@@ -6784,18 +6090,11 @@
           },
           "locale": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ]
+            "enum": ["en", "ja"]
           },
           "actorType": {
             "type": "string",
-            "enum": [
-              "user",
-              "system",
-              "api"
-            ]
+            "enum": ["user", "system", "api"]
           },
           "actorId": {
             "example": 123,
@@ -6826,10 +6125,7 @@
             ]
           }
         },
-        "required": [
-          "startDate",
-          "endDate"
-        ]
+        "required": ["startDate", "endDate"]
       }
     },
     {
@@ -6872,10 +6168,7 @@
           "required": false,
           "schema": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ]
+            "enum": ["en", "ja"]
           }
         },
         {
@@ -6884,11 +6177,7 @@
           "required": false,
           "schema": {
             "type": "string",
-            "enum": [
-              "user",
-              "system",
-              "api"
-            ]
+            "enum": ["user", "system", "api"]
           }
         },
         {
@@ -6946,18 +6235,11 @@
           },
           "locale": {
             "type": "string",
-            "enum": [
-              "en",
-              "ja"
-            ]
+            "enum": ["en", "ja"]
           },
           "actorType": {
             "type": "string",
-            "enum": [
-              "user",
-              "system",
-              "api"
-            ]
+            "enum": ["user", "system", "api"]
           },
           "actorId": {
             "example": 123,
@@ -6988,10 +6270,7 @@
             ]
           }
         },
-        "required": [
-          "startDate",
-          "endDate"
-        ]
+        "required": ["startDate", "endDate"]
       }
     },
     {
@@ -7065,9 +6344,7 @@
             "description": "Comment or reason for the assignment/status change"
           }
         },
-        "required": [
-          "deviceId"
-        ]
+        "required": ["deviceId"]
       }
     },
     {
@@ -7101,9 +6378,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "deviceId"
-        ]
+        "required": ["deviceId"]
       }
     },
     {
@@ -7179,9 +6454,7 @@
                 "description": "The assignment end date of the device. **assignmentEndDate must not be present if status is in_stock or decommissioned. Assignment end date must be after assignment start date**"
               }
             },
-            "required": [
-              "status"
-            ]
+            "required": ["status"]
           },
           "comment": {
             "type": "string",
@@ -7189,11 +6462,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "deviceId",
-          "createdAt",
-          "changes"
-        ]
+        "required": ["deviceId", "createdAt", "changes"]
       }
     },
     {
@@ -7227,11 +6496,7 @@
             "type": "number"
           },
           "deviceHistoryIds": {
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "description": "Array of device history entry IDs to delete. Maximum 50 IDs per request.",
             "type": "array",
             "items": {
@@ -7239,10 +6504,7 @@
             }
           }
         },
-        "required": [
-          "deviceId",
-          "deviceHistoryIds"
-        ]
+        "required": ["deviceId", "deviceHistoryIds"]
       }
     },
     {
@@ -7337,11 +6599,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "deviceId",
-          "historyId",
-          "changes"
-        ]
+        "required": ["deviceId", "historyId", "changes"]
       }
     },
     {
@@ -7386,10 +6644,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "deviceId",
-          "historyId"
-        ]
+        "required": ["deviceId", "historyId"]
       }
     },
     {
@@ -7623,9 +6878,7 @@
             "description": "Skip cache."
           }
         },
-        "required": [
-          "date"
-        ]
+        "required": ["date"]
       }
     },
     {
@@ -7738,9 +6991,7 @@
             "description": "Skip cache."
           }
         },
-        "required": [
-          "date"
-        ]
+        "required": ["date"]
       }
     },
     {
@@ -7774,9 +7025,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "identityId"
-        ]
+        "required": ["identityId"]
       }
     },
     {
@@ -7922,11 +7171,7 @@
             "example": 1
           },
           "peopleIds": {
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "type": "array",
             "items": {
               "type": "string"
@@ -7937,13 +7182,7 @@
             "example": "Contract notes"
           }
         },
-        "required": [
-          "serviceId",
-          "name",
-          "dueDate",
-          "repeatUnit",
-          "repeatValue"
-        ]
+        "required": ["serviceId", "name", "dueDate", "repeatUnit", "repeatValue"]
       }
     },
     {
@@ -7988,10 +7227,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "serviceId",
-          "contractId"
-        ]
+        "required": ["serviceId", "contractId"]
       }
     },
     {
@@ -8057,11 +7293,7 @@
             "example": 2
           },
           "peopleIds": {
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "type": "array",
             "items": {
               "type": "string"
@@ -8072,10 +7304,7 @@
             "example": "Updated contract notes"
           }
         },
-        "required": [
-          "serviceId",
-          "contractId"
-        ]
+        "required": ["serviceId", "contractId"]
       }
     },
     {
@@ -8120,10 +7349,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "serviceId",
-          "contractId"
-        ]
+        "required": ["serviceId", "contractId"]
       }
     },
     {
@@ -8188,13 +7414,7 @@
           "schema": {
             "example": "retired_account",
             "type": "string",
-            "enum": [
-              "retired_account",
-              "inactive_account",
-              "on_leave_account",
-              "unknown_account",
-              "public_files"
-            ]
+            "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"]
           }
         },
         {
@@ -8205,10 +7425,7 @@
           "schema": {
             "example": "warning",
             "type": "string",
-            "enum": [
-              "warning",
-              "caution"
-            ]
+            "enum": ["warning", "caution"]
           }
         },
         {
@@ -8270,22 +7487,13 @@
           "type": {
             "example": "retired_account",
             "type": "string",
-            "enum": [
-              "retired_account",
-              "inactive_account",
-              "on_leave_account",
-              "unknown_account",
-              "public_files"
-            ],
+            "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"],
             "description": "Filter by alert type"
           },
           "level": {
             "example": "warning",
             "type": "string",
-            "enum": [
-              "warning",
-              "caution"
-            ],
+            "enum": ["warning", "caution"],
             "description": "Filter by alert level"
           },
           "muted": {
@@ -8339,13 +7547,7 @@
           "schema": {
             "example": "retired_account",
             "type": "string",
-            "enum": [
-              "retired_account",
-              "inactive_account",
-              "on_leave_account",
-              "unknown_account",
-              "public_files"
-            ]
+            "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"]
           }
         },
         {
@@ -8382,13 +7584,7 @@
           "alertType": {
             "example": "retired_account",
             "type": "string",
-            "enum": [
-              "retired_account",
-              "inactive_account",
-              "on_leave_account",
-              "unknown_account",
-              "public_files"
-            ],
+            "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"],
             "description": "Filter by alert type"
           },
           "limit": {
@@ -8426,11 +7622,7 @@
         "properties": {
           "serviceIds": {
             "description": "Service IDs for which to mute alerts (max 50)",
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "type": "array",
             "items": {
               "type": "number"
@@ -8439,13 +7631,7 @@
           "alertType": {
             "type": "string",
             "description": "Optional: Specific alert type to mute (if not provided, mutes all alert types for the services)",
-            "enum": [
-              "retired_account",
-              "inactive_account",
-              "on_leave_account",
-              "unknown_account",
-              "public_files"
-            ],
+            "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"],
             "example": "retired_account"
           },
           "reason": {
@@ -8454,9 +7640,7 @@
             "example": "Service being decommissioned"
           }
         },
-        "required": [
-          "serviceIds"
-        ]
+        "required": ["serviceIds"]
       }
     },
     {
@@ -8480,11 +7664,7 @@
         "properties": {
           "serviceIds": {
             "description": "Service IDs for which to unmute alerts (max 50)",
-            "example": [
-              1,
-              2,
-              3
-            ],
+            "example": [1, 2, 3],
             "type": "array",
             "items": {
               "type": "number"
@@ -8493,19 +7673,11 @@
           "alertType": {
             "type": "string",
             "description": "Optional: Specific alert type to unmute (if not provided, unmutes all alert types for the services)",
-            "enum": [
-              "retired_account",
-              "inactive_account",
-              "on_leave_account",
-              "unknown_account",
-              "public_files"
-            ],
+            "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"],
             "example": "retired_account"
           }
         },
-        "required": [
-          "serviceIds"
-        ]
+        "required": ["serviceIds"]
       }
     },
     {
@@ -8529,10 +7701,7 @@
         "properties": {
           "accountIds": {
             "description": "Account IDs (peopleAccountIds) to mute alerts for",
-            "example": [
-              "157#user@example.com",
-              "158#another@example.com"
-            ],
+            "example": ["157#user@example.com", "158#another@example.com"],
             "type": "array",
             "items": {
               "type": "string"
@@ -8541,13 +7710,7 @@
           "alertType": {
             "type": "string",
             "description": "Alert type to mute",
-            "enum": [
-              "retired_account",
-              "inactive_account",
-              "on_leave_account",
-              "unknown_account",
-              "public_files"
-            ],
+            "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"],
             "example": "retired_account"
           },
           "until": {
@@ -8561,10 +7724,7 @@
             "default": false
           }
         },
-        "required": [
-          "accountIds",
-          "alertType"
-        ]
+        "required": ["accountIds", "alertType"]
       }
     },
     {
@@ -8588,10 +7748,7 @@
         "properties": {
           "accountIds": {
             "description": "Account IDs (peopleAccountIds) to unmute alerts for",
-            "example": [
-              "157#user@example.com",
-              "158#another@example.com"
-            ],
+            "example": ["157#user@example.com", "158#another@example.com"],
             "type": "array",
             "items": {
               "type": "string"
@@ -8600,13 +7757,7 @@
           "alertType": {
             "type": "string",
             "description": "Alert type to unmute",
-            "enum": [
-              "retired_account",
-              "inactive_account",
-              "on_leave_account",
-              "unknown_account",
-              "public_files"
-            ],
+            "enum": ["retired_account", "inactive_account", "on_leave_account", "unknown_account", "public_files"],
             "example": "retired_account"
           },
           "unmuteOtherAccounts": {
@@ -8615,10 +7766,7 @@
             "default": false
           }
         },
-        "required": [
-          "accountIds",
-          "alertType"
-        ]
+        "required": ["accountIds", "alertType"]
       }
     },
     {
@@ -8642,10 +7790,7 @@
         "properties": {
           "fileIds": {
             "description": "File IDs to mute public file alerts for",
-            "example": [
-              "file-id-1",
-              "file-id-2"
-            ],
+            "example": ["file-id-1", "file-id-2"],
             "type": "array",
             "items": {
               "type": "string"
@@ -8657,9 +7802,7 @@
             "example": "2024-12-31T23:59:59.000Z"
           }
         },
-        "required": [
-          "fileIds"
-        ]
+        "required": ["fileIds"]
       }
     },
     {
@@ -8683,19 +7826,14 @@
         "properties": {
           "fileIds": {
             "description": "File IDs to unmute public file alerts for",
-            "example": [
-              "file-id-1",
-              "file-id-2"
-            ],
+            "example": ["file-id-1", "file-id-2"],
             "type": "array",
             "items": {
               "type": "string"
             }
           }
         },
-        "required": [
-          "fileIds"
-        ]
+        "required": ["fileIds"]
       }
     }
   ]

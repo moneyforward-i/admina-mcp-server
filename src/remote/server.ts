@@ -10,10 +10,7 @@ import type { ToolRegistry } from "./types.js";
  * Must be created per-request so each tool call uses the correct credentials.
  */
 export function createRemoteMcpServer(apiKey: string, orgId: string, registry: ToolRegistry): Server {
-  const server = new Server(
-    { name: "admina-remote-mcp", version: "1.0.0" },
-    { capabilities: { tools: {} } },
-  );
+  const server = new Server({ name: "admina-remote-mcp", version: "1.0.0" }, { capabilities: { tools: {} } });
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: registry.tools.map((t) => ({

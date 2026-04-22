@@ -53,8 +53,11 @@ const ORIGINAL_API_KEY = process.env.ADMINA_API_KEY;
 const ORIGINAL_ORG_ID = process.env.ADMINA_ORGANIZATION_ID;
 
 beforeEach(() => {
-  // Clear env var credentials so header-based tests exercise the header path
+  // process.env only stores strings, so `= undefined` would produce the string "undefined" (truthy).
+  // Must use delete to fully unset so the ?? fallback exercises header-based auth.
+  // biome-ignore lint/performance/noDelete: unset env var — assignment produces the string "undefined"
   delete process.env.ADMINA_API_KEY;
+  // biome-ignore lint/performance/noDelete: unset env var — assignment produces the string "undefined"
   delete process.env.ADMINA_ORGANIZATION_ID;
 });
 
@@ -148,7 +151,7 @@ describe("HTTP handler", () => {
       headers: {
         ...VALID_HEADERS,
       },
-      maxBodyLength: Infinity,
+      maxBodyLength: Number.POSITIVE_INFINITY,
       validateStatus: () => true,
     });
     expect(response.status).toBe(413);

@@ -6,8 +6,8 @@ jest.mock("../../remote/proxy.js", () => ({
 
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
-import { createRemoteMcpServer } from "../../remote/server.js";
 import { proxyToolCall } from "../../remote/proxy.js";
+import { createRemoteMcpServer } from "../../remote/server.js";
 import type { ToolRegistry } from "../../remote/types.js";
 
 const FIXTURE_REGISTRY: ToolRegistry = {
