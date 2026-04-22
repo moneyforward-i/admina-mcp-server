@@ -17,7 +17,9 @@ function buildResolvedPath(
   const pathParamNames = new Set<string>();
   for (const param of tool.parameters.filter((p) => p.in === "path")) {
     pathParamNames.add(param.name);
-    const replacement = param.name === "organizationId" ? orgId : String(args[param.name] ?? "");
+    const raw = args[param.name] ?? "";
+    const replacement =
+      param.name === "organizationId" ? orgId : typeof raw === "object" ? JSON.stringify(raw) : String(raw);
     if (param.name === "organizationId" || args[param.name] !== undefined) {
       resolvedPath = resolvedPath.replace(`{${param.name}}`, encodeURIComponent(replacement));
     }
@@ -36,7 +38,8 @@ function buildQueryString(
     const value = args[param.name];
     if (value === undefined || value === null) continue;
     if (Array.isArray(value)) {
-      for (const item of value) queryString.append(param.name, String(item));
+      for (const item of value)
+        queryString.append(param.name, typeof item === "object" && item !== null ? JSON.stringify(item) : String(item));
     } else {
       const strValue = typeof value === "object" ? JSON.stringify(value) : String(value);
       queryString.set(param.name, strValue);
