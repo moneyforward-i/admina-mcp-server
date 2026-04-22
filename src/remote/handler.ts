@@ -63,10 +63,19 @@ async function parseBody(
   }
 }
 
-async function handleMcpPost(req: http.IncomingMessage, res: http.ServerResponse, registry: ToolRegistry): Promise<void> {
+async function handleMcpPost(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  registry: ToolRegistry,
+): Promise<void> {
   const accept = (req.headers["accept"] ?? "") as string;
   if (!accept.includes("application/json") || !accept.includes("text/event-stream")) {
-    rejectWithError(res, 406, -32000, "Not Acceptable: Accept header must include 'application/json' and 'text/event-stream'");
+    rejectWithError(
+      res,
+      406,
+      -32000,
+      "Not Acceptable: Accept header must include 'application/json' and 'text/event-stream'",
+    );
     return;
   }
 
@@ -106,7 +115,9 @@ async function handleMcpPost(req: http.IncomingMessage, res: http.ServerResponse
 }
 
 /** Create the HTTP request handler */
-export function createHttpHandler(registry: ToolRegistry): (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void> {
+export function createHttpHandler(
+  registry: ToolRegistry,
+): (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void> {
   return async (req, res) => {
     const url = req.url ?? "/";
     const method = req.method ?? "GET";

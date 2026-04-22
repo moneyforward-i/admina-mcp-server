@@ -6,10 +6,10 @@
 // Reads vulcan's OpenAPI 3.0 spec, filters out incompatible endpoints,
 // and writes src/generated/tools.json used by the remote MCP server.
 
-import axios from "axios";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import axios from "axios";
 import type { ToolDefinition, ToolParameter, ToolRegistry } from "../src/remote/types.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -55,8 +55,7 @@ interface OpenApiResponse {
 function resolveRef(ref: string, spec: OpenApiSpec): unknown {
   // Supports only local #/components/schemas/... refs
   const parts = ref.replace("#/", "").split("/");
-  // biome-ignore lint/suspicious/noExplicitAny: navigating generic JSON
-  let current: any = spec;
+  let current: any = spec; // arbitrary JSON traversal
   for (const part of parts) {
     current = current?.[part];
   }
@@ -72,7 +71,7 @@ function mergeAllOf(value: unknown[], spec: OpenApiSpec, depth: number): Record<
       (merged.required as string[]).push(...(r.required as string[]));
     }
   }
-  if ((merged.required as string[]).length === 0) delete merged.required;
+  if ((merged.required as string[]).length === 0) merged.required = undefined;
   return merged;
 }
 
@@ -224,7 +223,9 @@ async function main() {
   const specUrl = process.env.VULCAN_OPENAPI_URL;
   if (!specUrl) {
     console.error("Error: VULCAN_OPENAPI_URL environment variable is required");
-    console.error("Example: VULCAN_OPENAPI_URL=https://api.itmc.i.moneyforward.com/api/v1/openapi.json yarn generate:tools");
+    console.error(
+      "Example: VULCAN_OPENAPI_URL=https://api.itmc.i.moneyforward.com/api/v1/openapi.json yarn generate:tools",
+    );
     process.exit(1);
   }
 
@@ -261,7 +262,9 @@ async function main() {
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(registry, null, 2));
 
   console.log(`\nGenerated ${tools.length} tools → ${OUTPUT_PATH}`);
-  console.log(`Skipped: ${skippedDeprecated} deprecated, ${skippedBinary} binary/CSV, ${skippedAuth} auth, ${skippedNoOperationId} no-operationId`);
+  console.log(
+    `Skipped: ${skippedDeprecated} deprecated, ${skippedBinary} binary/CSV, ${skippedAuth} auth, ${skippedNoOperationId} no-operationId`,
+  );
 }
 
 try {

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import http from "node:http";
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import http from "node:http";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { createHttpHandler } from "./handler.js";
 import type { ToolRegistry } from "./types.js";
 
@@ -23,8 +23,8 @@ const server = http.createServer(createHttpHandler(registry));
 
 server.listen(PORT, () => {
   console.log(`admina-remote-mcp-server listening on port ${PORT}`);
-  console.log(`  POST /mcp   — MCP Streamable HTTP`);
-  console.log(`  GET  /healthz — health check`);
+  console.log("  POST /mcp   — MCP Streamable HTTP");
+  console.log("  GET  /healthz — health check");
 });
 
 server.on("error", (err) => {
