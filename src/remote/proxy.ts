@@ -8,6 +8,12 @@ import type { ToolDefinition } from "./types.js";
 // when running in the same VPC as vulcan to avoid the public internet hop.
 const DEFAULT_API_BASE = "https://api.itmc.i.moneyforward.com/api/v1";
 
+function serializeParam(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
+
 function buildResolvedPath(
   tool: ToolDefinition,
   args: Record<string, unknown>,
@@ -17,9 +23,7 @@ function buildResolvedPath(
   const pathParamNames = new Set<string>();
   for (const param of tool.parameters.filter((p) => p.in === "path")) {
     pathParamNames.add(param.name);
-    const raw = args[param.name] ?? "";
-    const replacement =
-      param.name === "organizationId" ? orgId : typeof raw === "object" ? JSON.stringify(raw) : String(raw);
+    const replacement = param.name === "organizationId" ? orgId : serializeParam(args[param.name]);
     if (param.name === "organizationId" || args[param.name] !== undefined) {
       resolvedPath = resolvedPath.replace(`{${param.name}}`, encodeURIComponent(replacement));
     }
@@ -38,11 +42,9 @@ function buildQueryString(
     const value = args[param.name];
     if (value === undefined || value === null) continue;
     if (Array.isArray(value)) {
-      for (const item of value)
-        queryString.append(param.name, typeof item === "object" && item !== null ? JSON.stringify(item) : String(item));
+      for (const item of value) queryString.append(param.name, serializeParam(item));
     } else {
-      const strValue = typeof value === "object" ? JSON.stringify(value) : String(value);
-      queryString.set(param.name, strValue);
+      queryString.set(param.name, serializeParam(value));
     }
   }
   return { queryString, queryParamNames };
