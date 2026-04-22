@@ -21,6 +21,9 @@ jest.mock("@modelcontextprotocol/sdk/server/streamableHttp.js", () => ({
 import http from "node:http";
 import axios from "axios";
 import { createHttpHandler } from "../../remote/handler.js";
+import type { ToolRegistry } from "../../remote/types.js";
+
+const MOCK_REGISTRY: ToolRegistry = { generatedAt: "", tools: [] };
 
 const VALID_HEADERS = {
   accept: "application/json, text/event-stream",
@@ -33,7 +36,7 @@ let testServer: http.Server;
 let baseUrl: string;
 
 beforeAll((done) => {
-  testServer = http.createServer(createHttpHandler());
+  testServer = http.createServer(createHttpHandler(MOCK_REGISTRY));
   testServer.listen(0, () => {
     const addr = testServer.address() as { port: number };
     baseUrl = `http://localhost:${addr.port}`;
@@ -219,7 +222,7 @@ describe("HTTP handler", () => {
 
     expect(response.status).toBe(200);
     // env var wins over header
-    expect(mockCreate).toHaveBeenCalledWith("env-api-key", "env-org-id");
+    expect(mockCreate).toHaveBeenCalledWith("env-api-key", "env-org-id", MOCK_REGISTRY);
   });
 
   it("POST /mcp with valid headers and valid JSON forwards to MCP server", async () => {

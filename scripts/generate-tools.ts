@@ -231,11 +231,14 @@ async function main() {
         op.requestBody?.content?.["application/json"],
       );
 
+      // Strip the /api/v1 prefix that the spec includes — proxy.ts already has it in DEFAULT_API_BASE
+      const toolPath = urlPath.replace(/^\/api\/v1/, "") || "/";
+
       tools.push({
         name: toSnakeCase(op.operationId),
         description: op.summary ?? op.description ?? op.operationId,
         method: method.toUpperCase(),
-        path: urlPath,
+        path: toolPath,
         parameters: resolvedParams,
         hasBody,
         inputSchema: buildInputSchema(resolvedParams, op.requestBody, spec),

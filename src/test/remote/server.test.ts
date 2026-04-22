@@ -1,38 +1,5 @@
 // src/test/remote/server.test.ts
 
-// Must mock before importing server.ts
-jest.mock("node:fs", () => ({
-  ...jest.requireActual("node:fs"),
-  readFileSync: jest.fn((path: string, ...rest: unknown[]) => {
-    if (String(path).includes("tools.json")) {
-      return JSON.stringify({
-        generatedAt: "2026-01-01T00:00:00Z",
-        tools: [
-          {
-            name: "get_identities",
-            description: "Get identities",
-            method: "GET",
-            path: "/organizations/{organizationId}/identities",
-            parameters: [
-              { name: "organizationId", in: "path", required: true },
-              { name: "keyword", in: "query", required: false },
-            ],
-            hasBody: false,
-            inputSchema: {
-              type: "object",
-              properties: { keyword: { type: "string" } },
-            },
-          },
-        ],
-      });
-    }
-    return (jest.requireActual("node:fs") as typeof import("node:fs")).readFileSync(
-      path as any,
-      ...(rest as any),
-    );
-  }),
-}));
-
 jest.mock("../../remote/proxy.js", () => ({
   proxyToolCall: jest.fn(),
 }));
@@ -41,11 +8,33 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createRemoteMcpServer } from "../../remote/server.js";
 import { proxyToolCall } from "../../remote/proxy.js";
+import type { ToolRegistry } from "../../remote/types.js";
+
+const FIXTURE_REGISTRY: ToolRegistry = {
+  generatedAt: "2026-01-01T00:00:00Z",
+  tools: [
+    {
+      name: "get_identities",
+      description: "Get identities",
+      method: "GET",
+      path: "/organizations/{organizationId}/identities",
+      parameters: [
+        { name: "organizationId", in: "path", required: true },
+        { name: "keyword", in: "query", required: false },
+      ],
+      hasBody: false,
+      inputSchema: {
+        type: "object",
+        properties: { keyword: { type: "string" } },
+      },
+    },
+  ],
+};
 
 const mockedProxyToolCall = proxyToolCall as jest.MockedFunction<typeof proxyToolCall>;
 
 async function makeClientServerPair(apiKey: string, orgId: string) {
-  const server = createRemoteMcpServer(apiKey, orgId);
+  const server = createRemoteMcpServer(apiKey, orgId, FIXTURE_REGISTRY);
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   await server.connect(serverTransport);
 
@@ -60,7 +49,7 @@ describe("createRemoteMcpServer", () => {
     jest.clearAllMocks();
   });
 
-  it("tools/list returns tools from mocked registry", async () => {
+  it("tools/list returns tools from registry", async () => {
     const { server, client } = await makeClientServerPair("api-key", "org-id");
 
     const result = await client.listTools();

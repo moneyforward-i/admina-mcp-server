@@ -6,6 +6,7 @@
 import http from "node:http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createRemoteMcpServer } from "./server.js";
+import type { ToolRegistry } from "./types.js";
 
 export const MAX_BODY_SIZE = 1 * 1024 * 1024; // 1 MB
 
@@ -39,7 +40,7 @@ export function rejectWithError(res: http.ServerResponse, httpStatus: number, co
 }
 
 /** Create the HTTP request handler */
-export function createHttpHandler(): (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void> {
+export function createHttpHandler(registry: ToolRegistry): (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void> {
   return async (req, res) => {
     const url = req.url ?? "/";
     const method = req.method ?? "GET";
@@ -100,7 +101,7 @@ export function createHttpHandler(): (req: http.IncomingMessage, res: http.Serve
       }
 
       // Create fresh server + transport per request (stateless)
-      const mcpServer = createRemoteMcpServer(apiKey, orgId);
+      const mcpServer = createRemoteMcpServer(apiKey, orgId, registry);
       const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
 
       // Register cleanup before handleRequest so it fires even for fast responses
