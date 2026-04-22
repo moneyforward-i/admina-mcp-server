@@ -1,0 +1,37 @@
+# Dockerfile.remote
+# Build: docker build -f Dockerfile.remote \
+#   --build-arg VULCAN_OPENAPI_URL=https://... \
+#   -t admina-remote-mcp .
+
+FROM node:22-alpine AS build
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+COPY tsconfig.json ./
+COPY src/ ./src/
+COPY scripts/ ./scripts/
+
+# Generate tool registry from OpenAPI spec at image build time
+ARG VULCAN_OPENAPI_URL
+RUN yarn generate:tools
+
+# Compile TypeScript
+RUN yarn build
+
+# ── Runtime image ─────────────────────────────────────────────────────────
+FROM node:22-alpine AS runtime
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --production
+
+COPY --from=build /app/build ./build
+
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s CMD wget -qO- http://localhost:3000/healthz || exit 1
+
+CMD ["node", "build/remote/index.js"]

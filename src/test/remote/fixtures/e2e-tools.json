@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-04-21T00:00:00.000Z",
+  "tools": [
+    {
+      "name": "get_identities",
+      "description": "Get a list of identities in the organization",
+      "method": "GET",
+      "path": "/organizations/{organizationId}/identity",
+      "parameters": [
+        { "name": "organizationId", "in": "path", "required": true },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "description": "Maximum number of results to return",
+          "schema": { "type": "integer" }
+        }
+      ],
+      "hasBody": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of results to return"
+          }
+        }
+      }
+    }
+  ]
+}
