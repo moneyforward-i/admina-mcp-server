@@ -39,6 +39,72 @@ export function rejectWithError(res: http.ServerResponse, httpStatus: number, co
   res.end(JSON.stringify({ jsonrpc: "2.0", error: { code, message }, id: null }));
 }
 
+function extractCredentials(req: http.IncomingMessage): { apiKey: string; orgId: string } {
+  const authHeader = (req.headers["authorization"] ?? "") as string;
+  const apiKey = process.env.ADMINA_API_KEY ?? (authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "");
+  const orgId = process.env.ADMINA_ORGANIZATION_ID ?? ((req.headers["x-organization-id"] ?? "") as string);
+  return { apiKey, orgId };
+}
+
+async function parseBody(
+  req: http.IncomingMessage,
+): Promise<{ ok: true; body: unknown } | { ok: false; status: number; code: number; message: string }> {
+  try {
+    const bodyText = await readBody(req);
+    return { ok: true, body: bodyText ? JSON.parse(bodyText) : undefined };
+  } catch (err) {
+    const isTooLarge = err instanceof Error && err.message === "Request body too large";
+    return {
+      ok: false,
+      status: 413,
+      code: isTooLarge ? -32600 : -32700,
+      message: isTooLarge ? "Request body too large (max 1 MB)" : "Parse error: invalid JSON body",
+    };
+  }
+}
+
+async function handleMcpPost(req: http.IncomingMessage, res: http.ServerResponse, registry: ToolRegistry): Promise<void> {
+  const accept = (req.headers["accept"] ?? "") as string;
+  if (!accept.includes("application/json") || !accept.includes("text/event-stream")) {
+    rejectWithError(res, 406, -32000, "Not Acceptable: Accept header must include 'application/json' and 'text/event-stream'");
+    return;
+  }
+
+  const { apiKey, orgId } = extractCredentials(req);
+  if (!apiKey || !orgId) {
+    rejectWithError(
+      res,
+      401,
+      -32001,
+      "Missing credentials: set ADMINA_API_KEY + ADMINA_ORGANIZATION_ID env vars, or pass Authorization (Bearer) + X-Organization-ID headers",
+    );
+    return;
+  }
+
+  const bodyResult = await parseBody(req);
+  if (!bodyResult.ok) {
+    rejectWithError(res, bodyResult.status, bodyResult.code, bodyResult.message);
+    return;
+  }
+
+  const mcpServer = createRemoteMcpServer(apiKey, orgId, registry);
+  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+
+  res.on("finish", () => {
+    mcpServer.close().catch(() => {});
+  });
+
+  try {
+    await mcpServer.connect(transport);
+    await transport.handleRequest(req, res, bodyResult.body);
+  } catch (error) {
+    log({ level: "error", msg: "MCP request error", orgId, error: String(error) });
+    if (!res.headersSent) {
+      rejectWithError(res, 500, -32603, "Internal error");
+    }
+  }
+}
+
 /** Create the HTTP request handler */
 export function createHttpHandler(registry: ToolRegistry): (req: http.IncomingMessage, res: http.ServerResponse) => Promise<void> {
   return async (req, res) => {
@@ -50,78 +116,17 @@ export function createHttpHandler(registry: ToolRegistry): (req: http.IncomingMe
       log({ method, path: url, status: res.statusCode, durationMs: Date.now() - startMs });
     });
 
-    // ── Health check ────────────────────────────────────────────────────────
     if (method === "GET" && url === "/healthz") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ status: "ok" }));
       return;
     }
 
-    // ── MCP endpoint ────────────────────────────────────────────────────────
     if (method === "POST" && url === "/mcp") {
-      // Validate Accept header per MCP Streamable HTTP spec
-      const accept = req.headers["accept"] ?? "";
-      if (!accept.includes("application/json") || !accept.includes("text/event-stream")) {
-        rejectWithError(res, 406, -32000, "Not Acceptable: Accept header must include 'application/json' and 'text/event-stream'");
-        return;
-      }
-
-      // Credentials: env vars take priority (AgentCore/shared-key mode),
-      // falling back to per-request headers (ECS/per-caller mode).
-      const authHeader = (req.headers["authorization"] ?? "") as string;
-      const apiKey =
-        process.env.ADMINA_API_KEY ??
-        (authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "");
-      const orgId =
-        process.env.ADMINA_ORGANIZATION_ID ??
-        ((req.headers["x-organization-id"] ?? "") as string);
-
-      if (!apiKey || !orgId) {
-        rejectWithError(
-          res,
-          401,
-          -32001,
-          "Missing credentials: set ADMINA_API_KEY + ADMINA_ORGANIZATION_ID env vars, or pass Authorization (Bearer) + X-Organization-ID headers",
-        );
-        return;
-      }
-
-      // Parse body
-      let parsedBody: unknown;
-      try {
-        const bodyText = await readBody(req);
-        parsedBody = bodyText ? JSON.parse(bodyText) : undefined;
-      } catch (err) {
-        const msg = err instanceof Error && err.message === "Request body too large"
-          ? "Request body too large (max 1 MB)"
-          : "Parse error: invalid JSON body";
-        const code = err instanceof Error && err.message === "Request body too large" ? -32600 : -32700;
-        rejectWithError(res, 413, code, msg);
-        return;
-      }
-
-      // Create fresh server + transport per request (stateless)
-      const mcpServer = createRemoteMcpServer(apiKey, orgId, registry);
-      const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
-
-      // Register cleanup before handleRequest so it fires even for fast responses
-      res.on("finish", () => {
-        mcpServer.close().catch(() => {});
-      });
-
-      try {
-        await mcpServer.connect(transport);
-        await transport.handleRequest(req, res, parsedBody);
-      } catch (error) {
-        log({ level: "error", msg: "MCP request error", orgId, error: String(error) });
-        if (!res.headersSent) {
-          rejectWithError(res, 500, -32603, "Internal error");
-        }
-      }
+      await handleMcpPost(req, res, registry);
       return;
     }
 
-    // ── 404 ─────────────────────────────────────────────────────────────────
     res.writeHead(404, { "Content-Type": "text/plain" });
     res.end("Not Found");
   };

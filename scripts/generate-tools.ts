@@ -63,6 +63,19 @@ function resolveRef(ref: string, spec: OpenApiSpec): unknown {
   return current;
 }
 
+function mergeAllOf(value: unknown[], spec: OpenApiSpec, depth: number): Record<string, unknown> {
+  const merged: Record<string, unknown> = { type: "object", properties: {}, required: [] };
+  for (const sub of value) {
+    const r = resolveSchema(sub, spec, depth + 1) as Record<string, unknown>;
+    Object.assign(merged.properties as Record<string, unknown>, r.properties ?? {});
+    if (Array.isArray(r.required)) {
+      (merged.required as string[]).push(...(r.required as string[]));
+    }
+  }
+  if ((merged.required as string[]).length === 0) delete merged.required;
+  return merged;
+}
+
 function resolveSchema(schema: unknown, spec: OpenApiSpec, depth = 0): unknown {
   if (depth > 10 || schema == null || typeof schema !== "object") return schema;
   const s = schema as Record<string, unknown>;
@@ -74,17 +87,7 @@ function resolveSchema(schema: unknown, spec: OpenApiSpec, depth = 0): unknown {
   const resolved: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(s)) {
     if (key === "allOf" && Array.isArray(value)) {
-      // Merge allOf schemas
-      const merged: Record<string, unknown> = { type: "object", properties: {}, required: [] };
-      for (const sub of value) {
-        const r = resolveSchema(sub, spec, depth + 1) as Record<string, unknown>;
-        Object.assign((merged.properties as Record<string, unknown>), r.properties ?? {});
-        if (Array.isArray(r.required)) {
-          (merged.required as string[]).push(...(r.required as string[]));
-        }
-      }
-      if ((merged.required as string[]).length === 0) delete merged.required;
-      return merged;
+      return mergeAllOf(value, spec, depth);
     }
     if (key === "properties" && typeof value === "object" && value !== null) {
       resolved[key] = Object.fromEntries(
@@ -118,13 +121,31 @@ function isAuthPath(urlPath: string): boolean {
 
 function toSnakeCase(str: string): string {
   return str
-    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1_$2")
-    .replace(/([a-z\d])([A-Z])/g, "$1_$2")
+    .replaceAll(/([A-Z]+)([A-Z][a-z])/g, "$1_$2")
+    .replaceAll(/([a-z\d])([A-Z])/g, "$1_$2")
     .toLowerCase()
     .replace(/^_/, "");
 }
 
 // ── Input schema builder ───────────────────────────────────────────────────
+
+function addBodyProperties(
+  requestBody: OpenApiRequestBody | undefined,
+  spec: OpenApiSpec,
+  properties: Record<string, unknown>,
+  required: string[],
+): void {
+  const schema = requestBody?.content?.["application/json"]?.schema;
+  if (!schema) return;
+  const bodySchema = resolveSchema(schema, spec) as Record<string, unknown>;
+  if (bodySchema.type !== "object" || !bodySchema.properties) return;
+  for (const [name, propSchema] of Object.entries(bodySchema.properties as Record<string, unknown>)) {
+    properties[name] = propSchema;
+  }
+  if (Array.isArray(bodySchema.required)) {
+    required.push(...(bodySchema.required as string[]));
+  }
+}
 
 function buildInputSchema(
   parameters: OpenApiParameter[],
@@ -134,38 +155,67 @@ function buildInputSchema(
   const properties: Record<string, unknown> = {};
   const required: string[] = [];
 
-  // Add query and path (non-organizationId) parameters
   for (const param of parameters) {
     if (param.in === "header") continue; // skip header params
     if (param.name === "organizationId") continue; // injected from X-Organization-ID
-
     const schema = resolveSchema(param.schema ?? { type: "string" }, spec);
-    properties[param.name] = {
-      ...(schema as Record<string, unknown>),
-      description: param.description,
-    };
+    properties[param.name] = { ...(schema as Record<string, unknown>), description: param.description };
     if (param.required) required.push(param.name);
   }
 
-  // Add request body properties
-  if (requestBody?.content?.["application/json"]?.schema) {
-    const bodySchema = resolveSchema(requestBody.content["application/json"].schema, spec) as Record<string, unknown>;
-    if (bodySchema.type === "object" && bodySchema.properties) {
-      const bodyProps = bodySchema.properties as Record<string, unknown>;
-      for (const [name, propSchema] of Object.entries(bodyProps)) {
-        properties[name] = propSchema;
-      }
-      if (Array.isArray(bodySchema.required)) {
-        required.push(...(bodySchema.required as string[]));
-      }
-    }
-  }
+  addBodyProperties(requestBody, spec, properties, required);
 
   return {
     type: "object",
     properties,
     ...(required.length > 0 ? { required } : {}),
   };
+}
+
+// ── Operation processor ────────────────────────────────────────────────────
+
+type SkipReason = "deprecated" | "binary" | "noOperationId";
+
+function processOperation(
+  urlPath: string,
+  method: HttpMethod,
+  op: OpenApiOperation,
+  spec: OpenApiSpec,
+  tools: ToolDefinition[],
+): SkipReason | null {
+  if (op.deprecated) return "deprecated";
+  if (hasBinaryResponse(op)) return "binary";
+  if (!op.operationId) {
+    console.warn(`Warning: operation ${method.toUpperCase()} ${urlPath} has no operationId — skipping`);
+    return "noOperationId";
+  }
+
+  const rawParams = op.parameters ?? [];
+  const resolvedParams: ToolParameter[] = rawParams.map((p) => {
+    const resolved = p["$ref"] ? (resolveRef(p["$ref"], spec) as OpenApiParameter) : p;
+    return {
+      name: resolved.name,
+      in: resolved.in,
+      required: resolved.required ?? false,
+      description: resolved.description,
+      schema: resolveSchema(resolved.schema, spec) as Record<string, unknown> | undefined,
+    };
+  });
+
+  const hasBody = Boolean(op.requestBody?.content?.["application/json"]);
+  const toolPath = urlPath.replace(/^\/api\/v1/, "") || "/";
+
+  tools.push({
+    name: toSnakeCase(op.operationId),
+    description: op.summary ?? op.description ?? op.operationId,
+    method: method.toUpperCase(),
+    path: toolPath,
+    parameters: resolvedParams,
+    hasBody,
+    inputSchema: buildInputSchema(resolvedParams, op.requestBody, spec),
+  });
+
+  return null;
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────
@@ -192,57 +242,13 @@ async function main() {
       skippedAuth++;
       continue;
     }
-
     for (const method of HTTP_METHODS) {
       const op = pathItem[method] as OpenApiOperation | undefined;
       if (!op) continue;
-
-      if (op.deprecated) {
-        skippedDeprecated++;
-        continue;
-      }
-
-      if (hasBinaryResponse(op)) {
-        skippedBinary++;
-        continue;
-      }
-
-      if (!op.operationId) {
-        console.warn(`Warning: operation ${method.toUpperCase()} ${urlPath} has no operationId — skipping`);
-        skippedNoOperationId++;
-        continue;
-      }
-
-      const rawParams = op.parameters ?? [];
-      const resolvedParams: ToolParameter[] = rawParams.map((p) => {
-        const resolved = p["$ref"]
-          ? (resolveRef(p["$ref"], spec) as OpenApiParameter)
-          : p;
-        return {
-          name: resolved.name,
-          in: resolved.in,
-          required: resolved.required ?? false,
-          description: resolved.description,
-          schema: resolveSchema(resolved.schema, spec) as Record<string, unknown> | undefined,
-        };
-      });
-
-      const hasBody = Boolean(
-        op.requestBody?.content?.["application/json"],
-      );
-
-      // Strip the /api/v1 prefix that the spec includes — proxy.ts already has it in DEFAULT_API_BASE
-      const toolPath = urlPath.replace(/^\/api\/v1/, "") || "/";
-
-      tools.push({
-        name: toSnakeCase(op.operationId),
-        description: op.summary ?? op.description ?? op.operationId,
-        method: method.toUpperCase(),
-        path: toolPath,
-        parameters: resolvedParams,
-        hasBody,
-        inputSchema: buildInputSchema(resolvedParams, op.requestBody, spec),
-      });
+      const skipReason = processOperation(urlPath, method, op, spec, tools);
+      if (skipReason === "deprecated") skippedDeprecated++;
+      else if (skipReason === "binary") skippedBinary++;
+      else if (skipReason === "noOperationId") skippedNoOperationId++;
     }
   }
 
@@ -258,7 +264,9 @@ async function main() {
   console.log(`Skipped: ${skippedDeprecated} deprecated, ${skippedBinary} binary/CSV, ${skippedAuth} auth, ${skippedNoOperationId} no-operationId`);
 }
 
-main().catch((err) => {
+try {
+  await main();
+} catch (err) {
   console.error("Fatal:", err);
   process.exit(1);
-});
+}
