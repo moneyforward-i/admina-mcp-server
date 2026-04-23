@@ -319,7 +319,7 @@ const toolDefinitions = [
 export function createServer(): Server {
   const server = new Server(
     {
-      name: "admina-mpc",
+      name: "admina-mcp",
       version: "1.0.0",
     },
     {

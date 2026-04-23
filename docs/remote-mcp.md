@@ -58,13 +58,13 @@ See the [Admina API docs](https://docs.itmc.i.moneyforward.com/reference/getting
 
 ## Endpoint
 
-| Method | Path | Purpose |
+| Method | Path | Response |
 |---|---|---|
-| `POST` | `/mcp` | Send an MCP JSON-RPC message (initialize, tools/list, tools/call, …) |
-| `GET` | `/mcp` | Open a streaming response (reserved; not needed by most clients) |
-| `DELETE` | `/mcp` | Reserved by the MCP spec for session teardown. Not meaningful in the stateless server — safe to call and ignore the response. |
+| `POST` | `/mcp` | MCP JSON-RPC response (initialize, tools/list, tools/call, …) |
+| any other method | `/mcp` | `405 Method Not Allowed` with `Allow: POST` |
+| any method | anywhere else | `404 Not Found` |
 
-The server is **stateless** — every request stands alone and includes its own credentials, so there is no MCP session to tear down between requests.
+The server runs in **stateless** mode — every request stands alone and carries its own credentials. There is no MCP session, so the spec's GET (long-lived SSE stream) and DELETE (session teardown) endpoints have nothing to operate on and return 405.
 
 ## Client configuration
 
@@ -129,11 +129,14 @@ curl -sS -X POST http://127.0.0.1:3000/mcp \
 
 ## Security notes
 
-- **Default bind is `127.0.0.1`** — the server is only reachable from the local host. To expose it on a network interface you must pass `--host 0.0.0.0` (or a specific IP) explicitly.
+- **Default bind is `127.0.0.1`** — the server is only reachable from the local host. To expose it on a network interface pass `--host 0.0.0.0` (or a specific IP) explicitly.
+- **DNS rebinding protection is on by default for loopback binds.** When `--host` is `127.0.0.1`, `localhost`, or `::1`, incoming requests must carry a `Host` header matching one of `127.0.0.1:<port>`, `localhost:<port>`, or `[::1]:<port>`; other hosts return `403 forbidden_host`. For non-loopback binds you are responsible for configuring DNS-rebinding protection upstream (reverse proxy, API gateway, `allowedHosts` option if embedding `runHttp` programmatically).
+- **Organization ID is shape-validated.** The server rejects `X-Admina-Organization-Id` values that do not match `^[A-Za-z0-9_-]{1,64}$` with `400 invalid_organization_id`. This prevents path-injection via the URL interpolated into outbound Admina API calls.
 - **Always put TLS in front of a public deployment.** The bearer token and organization ID travel in request headers; they are secrets.
-- **The server itself does no rate-limiting.** For public deployments, put an API gateway or reverse proxy (Cloudflare, nginx, AWS API Gateway, etc.) in front with appropriate rate limits.
+- **The server does no rate-limiting.** For public deployments, put an API gateway or reverse proxy (Cloudflare, nginx, AWS API Gateway, etc.) in front with appropriate rate limits.
 - **Never log credentials.** The server deliberately does not emit request headers or bodies — keep that discipline in any middleware you add.
 - **Bearer tokens are per-request.** There is no session; compromising a single request does not grant forward access. Rotate keys in Admina if you suspect a leak.
+- **Request body size is capped at 1 MiB.** Oversized payloads return `413 payload_too_large`.
 
 ## Troubleshooting
 
@@ -141,6 +144,10 @@ curl -sS -X POST http://127.0.0.1:3000/mcp \
 |---|---|---|
 | 401 "Missing Authorization header" | No `Authorization` header sent | Add `Authorization: Bearer <ADMINA_API_KEY>` |
 | 401 "Missing X-Admina-Organization-Id header" | Organization ID header absent | Add `X-Admina-Organization-Id: <ORG_ID>` |
+| 400 "invalid_organization_id" | Org ID header fails shape check | Must match `/^[A-Za-z0-9_-]{1,64}$/` |
 | 400 "Request body must be valid JSON." | Body is not JSON | Ensure a well-formed JSON-RPC body |
+| 403 "forbidden_host" | DNS-rebinding check rejected `Host` header | For loopback binds, use `127.0.0.1:<port>`, `localhost:<port>`, or `[::1]:<port>`. For non-loopback binds, configure `allowedHosts`. |
 | 404 "Unknown path" | Requested path other than `/mcp` | Use `POST /mcp` |
+| 405 "method_not_allowed" | Non-POST method on `/mcp` | Use POST (stateless mode) |
+| 413 "payload_too_large" | Body exceeds 1 MiB | Split work into smaller requests |
 | 500 Internal from a tool call | Admina API returned an error; the MCP response wraps it | Check tool response body — `isError: true` with the Admina message |

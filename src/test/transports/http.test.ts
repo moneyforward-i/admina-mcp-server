@@ -31,6 +31,52 @@ function installAxiosCapture(sink: AxiosCall[], canned: unknown) {
   mockedAxios.delete.mockImplementation(capture("delete") as any);
 }
 
+// Install axios mocks that only resolve once `release()` is called. Used to
+// prove credential isolation under genuine concurrent in-flight execution:
+// every concurrent handler's axios call parks in the same mock until we
+// release them, so all ALS contexts must be live simultaneously.
+function installGatedAxios(sink: AxiosCall[], canned: unknown) {
+  const waiters: Array<() => void> = [];
+  const gate = new Promise<void>((resolve) => {
+    waiters.push(resolve);
+  });
+  let releaseResolve: (() => void) | null = null;
+  const release = new Promise<void>((resolve) => {
+    releaseResolve = resolve;
+  });
+
+  const impl =
+    (method: string) =>
+    async (url: string, ...rest: any[]) => {
+      const hasBody = method === "post" || method === "put" || method === "patch";
+      const config = hasBody ? rest[1] : rest[0];
+      const body = hasBody ? rest[0] : undefined;
+      sink.push({ method, url, headers: (config?.headers ?? {}) as Record<string, string>, body });
+      await release;
+      return { data: canned };
+    };
+
+  mockedAxios.get.mockImplementation(impl("get") as any);
+  mockedAxios.post.mockImplementation(impl("post") as any);
+  mockedAxios.patch.mockImplementation(impl("patch") as any);
+  mockedAxios.put.mockImplementation(impl("put") as any);
+  mockedAxios.delete.mockImplementation(impl("delete") as any);
+
+  return {
+    waitUntilInFlight: async (count: number) => {
+      // Poll the sink until `count` calls are recorded.
+      const deadline = Date.now() + 3000;
+      while (sink.length < count && Date.now() < deadline) {
+        await new Promise((r) => setImmediate(r));
+      }
+      if (sink.length < count) throw new Error(`Only ${sink.length}/${count} calls reached axios before timeout`);
+    },
+    release: () => releaseResolve?.(),
+    gate,
+    waiters,
+  };
+}
+
 async function startServer(): Promise<HttpHandle> {
   return runHttp({ port: 0, host: "127.0.0.1" });
 }
@@ -98,13 +144,73 @@ describe("runHttp", () => {
       expect(body.error).toBe("unauthorized");
       expect(body.message).toMatch(/Organization/);
     });
+
+    it("rejects X-Admina-Organization-Id with path-injection characters (400)", async () => {
+      const res = await rawPost(
+        endpoint(handle),
+        { Authorization: "Bearer key-1", "X-Admina-Organization-Id": "org/../admin" },
+        "{}",
+      );
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as { error: string };
+      expect(body.error).toBe("invalid_organization_id");
+    });
   });
 
-  describe("routing", () => {
+  describe("method + path routing", () => {
     it("returns 404 for unknown paths", async () => {
       const url = `http://${handle.host}:${handle.port}/health`;
       const res = await fetch(url, { method: "GET" });
       expect(res.status).toBe(404);
+    });
+
+    it("returns 405 for GET /mcp (stateless mode supports POST only)", async () => {
+      const res = await fetch(endpoint(handle), {
+        method: "GET",
+        headers: { Authorization: "Bearer key-1", "X-Admina-Organization-Id": "org-1" },
+      });
+      expect(res.status).toBe(405);
+      expect(res.headers.get("allow")).toBe("POST");
+    });
+
+    it("returns 405 for DELETE /mcp", async () => {
+      const res = await fetch(endpoint(handle), {
+        method: "DELETE",
+        headers: { Authorization: "Bearer key-1", "X-Admina-Organization-Id": "org-1" },
+      });
+      expect(res.status).toBe(405);
+    });
+  });
+
+  describe("body handling", () => {
+    it("returns 400 for invalid JSON body", async () => {
+      const res = await rawPost(
+        endpoint(handle),
+        { Authorization: "Bearer key-1", "X-Admina-Organization-Id": "org-1" },
+        "not-json",
+      );
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as { error: string };
+      expect(body.error).toBe("invalid_json");
+    });
+  });
+
+  describe("DNS rebinding protection", () => {
+    it("rejects requests with a disallowed Host header (403)", async () => {
+      const res = await fetch(endpoint(handle), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json, text/event-stream",
+          Authorization: "Bearer key-1",
+          "X-Admina-Organization-Id": "org-1",
+          Host: "evil.example.com",
+        },
+        body: "{}",
+      });
+      expect(res.status).toBe(403);
+      const body = (await res.json()) as { error: string };
+      expect(body.error).toBe("forbidden_host");
     });
   });
 
@@ -152,9 +258,13 @@ describe("runHttp", () => {
       await transport.close();
     });
 
-    it("isolates credentials across concurrent requests from different tenants", async () => {
+    it("isolates credentials across genuinely concurrent in-flight requests", async () => {
+      // This variant uses a gated axios mock to force all three requests to be
+      // in-flight simultaneously before any returns. Only then can we release
+      // them. If AsyncLocalStorage isolation were broken, the captured axios
+      // call for each tenant would carry the wrong credentials.
       const calls: AxiosCall[] = [];
-      installAxiosCapture(calls, { id: "x" });
+      const gate = installGatedAxios(calls, { id: "x" });
 
       const runTenant = async (apiKey: string, organizationId: string) => {
         const { client, transport } = await makeClient(apiKey, organizationId);
@@ -163,7 +273,20 @@ describe("runHttp", () => {
         await transport.close();
       };
 
-      await Promise.all([runTenant("key-A", "org-A"), runTenant("key-B", "org-B"), runTenant("key-C", "org-C")]);
+      const pending = Promise.all([
+        runTenant("key-A", "org-A"),
+        runTenant("key-B", "org-B"),
+        runTenant("key-C", "org-C"),
+      ]);
+
+      // Wait for all three tool handlers to reach the axios mock — this proves
+      // all three requests are holding live credentials concurrently.
+      await gate.waitUntilInFlight(3);
+      expect(calls).toHaveLength(3);
+
+      // Release and let all requests complete.
+      gate.release();
+      await pending;
 
       const byOrg = (org: string) => calls.find((c) => new RegExp(`/organizations/${org}(/|\\?|$)`).test(c.url));
       expect(byOrg("org-A")?.headers.Authorization).toBe("Bearer key-A");

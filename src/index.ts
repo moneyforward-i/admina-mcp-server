@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { HttpOptions, runHttp } from "./transports/http.js";
+import { type HttpOptions, runHttp } from "./transports/http.js";
 import { runStdio } from "./transports/stdio.js";
 
 export interface CliOptions {
