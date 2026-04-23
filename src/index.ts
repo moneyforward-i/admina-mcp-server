@@ -1,393 +1,69 @@
 #!/usr/bin/env node
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import { z } from "zod";
-import { zodToJsonSchema } from "zod-to-json-schema";
-import { formatAdminaError, isAdminaError } from "./common/errors.js";
-import { CreateIdentityCustomFieldSchema, createIdentityCustomField } from "./tools/createIdentityCustomField.js";
-import { DeleteIdentityCustomFieldSchema, deleteIdentityCustomField } from "./tools/deleteIdentityCustomField.js";
-import { IdentityConfigFiltersSchema, getIdentityConfig } from "./tools/getIdentityConfig.js";
-import { IdentityCustomFieldsFiltersSchema, getIdentityCustomFields } from "./tools/getIdentityCustomField.js";
-import {
-  ArchiveIdentitySchema,
-  BulkUpdateIdentitiesSchema,
-  CheckIdentityManagementTypeSchema,
-  CreateDeviceCustomFieldSchema,
-  CreateDeviceSchema,
-  CreateIdentitySchema,
-  DeleteDeviceCustomFieldSchema,
-  DeleteIdentitySchema,
-  DeviceCustomFieldsSchema,
-  DeviceFiltersSchema,
-  GetIdentitiesStatsSchema,
-  GetIdentityFieldConfigurationSchema,
-  GetIdentityHistorySchema,
-  GetIdentitySchema,
-  IdentityFiltersSchema,
-  MergeIdentitiesSchema,
-  OrganizationInfoSchema,
-  PeopleAccountsFiltersSchema,
-  ServiceAccountFiltersSchema,
-  ServiceFiltersSchema,
-  UnmergeIdentitiesSchema,
-  UnregisterIdentitySchema,
-  UpdateDeviceCustomFieldSchema,
-  UpdateDeviceMetaSchema,
-  UpdateDeviceSchema,
-  UpdateIdentitySchema,
-  archiveIdentity,
-  bulkUpdateIdentities,
-  checkIdentityManagementType,
-  createDevice,
-  createDeviceCustomField,
-  createIdentity,
-  deleteDeviceCustomField,
-  deleteIdentity,
-  getDeviceCustomFields,
-  getDevices,
-  getIdentities,
-  getIdentitiesStats,
-  getIdentity,
-  getIdentityFieldConfiguration,
-  getIdentityHistory,
-  getOrganizationInfo,
-  getPeopleAccounts,
-  getServiceAccounts,
-  getServices,
-  mergeIdentities,
-  unmergeIdentities,
-  unregisterIdentity,
-  updateDevice,
-  updateDeviceCustomField,
-  updateDeviceMeta,
-  updateIdentity,
-} from "./tools/index.js";
-import { UpdateIdentityCustomFieldSchema, updateIdentityCustomField } from "./tools/updateIdentityCustomField.js";
+import { HttpOptions, runHttp } from "./transports/http.js";
+import { runStdio } from "./transports/stdio.js";
 
-const server = new Server(
-  {
-    name: "admina-mpc",
-    version: "1.0.0",
-  },
-  {
-    capabilities: {
-      tools: {},
-    },
-  },
-);
+export interface CliOptions {
+  transport: "stdio" | "http";
+  http: HttpOptions;
+}
 
-server.setRequestHandler(ListToolsRequestSchema, async () => {
-  return {
-    tools: [
-      {
-        name: "get_organization_info",
-        description:
-          "Get information about the organization including name, unique name, status, system language, etc.",
-        inputSchema: zodToJsonSchema(OrganizationInfoSchema),
-      },
-      {
-        name: "get_devices",
-        description: `Get a list of devices for an organization using advanced search and filtering.
+export const DEFAULT_HTTP_PORT = 3000;
+export const DEFAULT_HTTP_HOST = "127.0.0.1";
 
-## Key Features
-- Combine query parameters (pagination, sorting) with body parameters (filtering)
-- Support for text search, field-specific filters, and complex queries
-- Pagination with cursor-based navigation
+export function parseCliOptions(argv: string[], env: NodeJS.ProcessEnv): CliOptions {
+  let transport: "stdio" | "http" = env.MCP_TRANSPORT === "http" ? "http" : "stdio";
+  let port = env.MCP_HTTP_PORT ? Number(env.MCP_HTTP_PORT) : DEFAULT_HTTP_PORT;
+  let host = env.MCP_HTTP_HOST ?? DEFAULT_HTTP_HOST;
 
-## Example Usage
-**Find first 5 devices for user with email "someone@gmail.com":**
-- Query: limit=5
-- Body: {"searchTerm": "someone@gmail.com", "searchFields": ["people.primaryEmail"]}
-
-## Pro Tips
-- **1**: Always make sure understand the definition of the fields (preset and custom fields) before using them.
-- **2**: If user search devices by category: pc, phone or other, please use body.type to filter devices by category.
-- **3**: Always to understand what are current sub types of the devices. If the user search information relate to sub types, Please use body.filters.["preset.subtype"] to filter devices by sub types.
-- **4**: We don't really need to use searchFields parameter to the search results in all fields, only use it when the user search information relate to specific fields.
-- **5**: If user want to filter devices by status, please use body.filters.["preset.status"].eq to filter devices by status.
-- **5.1**: Unassigned devices status should be "in_stock" or "decommissioned".
-- **6**: If user want to filter devices by preset fields or custom fields, please check the field.kind first, we only support date, number, dropdown kind of fields.
-- **6.1**: If the field.kind is date, please use body.filters.["preset.field_name"].minDate or body.filters.["custom.attributeCode"].minDate and body.filters.["preset.field_name"].maxDate or body.filters.["custom.attributeCode"].maxDate to filter devices by date range.
-- **6.2**: If the field.kind is number, please use body.filters.["preset.field_name"].minNumber or body.filters.["custom.attributeCode"].minNumber and body.filters.["preset.field_name"].maxNumber or body.filters.["custom.attributeCode"].maxNumber to filter devices by number range.
-- **6.3**: If the preset field field.kind is dropdown, please use body.filters.["preset.field_name"].eq or body.filters.["custom.attributeCode"].eq to filter devices by dropdown value.
-- **7**: Combine multiple filters examples: {"preset.status":{"eq":"active"},"preset.subtype":{"eq":"desktop_pc"},"custom.custom_xxx":{"eq":"1"},"custom.dt_13":{"minDate":"2025-12-23","maxDate":"2025-12-25"},"custom.drp_4":{"eq":"1"}}`,
-        inputSchema: zodToJsonSchema(DeviceFiltersSchema),
-      },
-      {
-        name: "create_device",
-        description:
-          "Create a new device for an organization. Requires device type (subtype), asset number, and model name. Can include optional preset fields and custom fields.",
-        inputSchema: zodToJsonSchema(CreateDeviceSchema),
-      },
-      {
-        name: "update_device",
-        description:
-          "Update an existing device's information. Can update preset fields, custom fields, and device properties. Note: fields.preset.asset_number, fields.preset.subtype, fields.preset.model_name are always required.",
-        inputSchema: zodToJsonSchema(UpdateDeviceSchema),
-      },
-      {
-        name: "update_device_meta",
-        description:
-          "Update device's meta information including assignment info (peopleId, status, dates) and location. Use this to assign/unassign devices to people. When unassigned, status should be 'in_stock' or 'decommissioned'. When assigned without status, defaults to 'active'.",
-        inputSchema: zodToJsonSchema(UpdateDeviceMetaSchema),
-      },
-      {
-        name: "get_device_custom_fields",
-        description:
-          "Get all custom fields configured for an organization's devices. Returns field definitions, types (text, date, number, dropdown), and configurations.",
-        inputSchema: zodToJsonSchema(DeviceCustomFieldsSchema),
-      },
-      {
-        name: "create_device_custom_field",
-        description:
-          "Create a new custom field for organization devices. Defines a new field that can be used across all devices in the organization.",
-        inputSchema: zodToJsonSchema(CreateDeviceCustomFieldSchema),
-      },
-      {
-        name: "update_device_custom_field",
-        description:
-          "Update an existing device custom field configuration. Can modify field name, code, visibility for device types, and dropdown configuration.",
-        inputSchema: zodToJsonSchema(UpdateDeviceCustomFieldSchema),
-      },
-      {
-        name: "delete_device_custom_field",
-        description:
-          "Delete a device custom field configuration. Removes a custom field definition from the organization.",
-        inputSchema: zodToJsonSchema(DeleteDeviceCustomFieldSchema),
-      },
-      {
-        name: "get_identities",
-        description:
-          "Return a list of identities. Can be filtered by the status, department and type. Can also search by the email or name by keyword",
-        inputSchema: zodToJsonSchema(IdentityFiltersSchema),
-      },
-      {
-        name: "create_identity",
-        description:
-          "Create a new identity in the organization. Requires employeeStatus, employeeType, firstName, and lastName. Optional: displayName, primaryEmail, department, jobTitle, employeeId, lifecycle, customFields, manager, etc.",
-        inputSchema: zodToJsonSchema(CreateIdentitySchema),
-      },
-      {
-        name: "get_identity",
-        description: "Get a single identity by ID. Optionally expand with customFieldsMetadata.",
-        inputSchema: zodToJsonSchema(GetIdentitySchema),
-      },
-      {
-        name: "update_identity",
-        description:
-          "Update an existing identity. Pass identityId and any fields to update (employeeStatus, employeeType, displayName, primaryEmail, department, jobTitle, customFields, manager, etc.).",
-        inputSchema: zodToJsonSchema(UpdateIdentitySchema),
-      },
-      {
-        name: "delete_identity",
-        description: "Delete an identity by ID. Returns the deleted identity.",
-        inputSchema: zodToJsonSchema(DeleteIdentitySchema),
-      },
-      {
-        name: "get_services",
-        description:
-          "Return a list of services, along with the preview of the accounts. Can be searched by the service name by keyword",
-        inputSchema: zodToJsonSchema(ServiceFiltersSchema),
-      },
-      {
-        name: "get_service_accounts",
-        description:
-          "Return a list of accounts for a specific service. The serviceId can be obtained from the get_services tool. Can be searched by email/name of the account by keyword",
-        inputSchema: zodToJsonSchema(ServiceAccountFiltersSchema),
-      },
-      {
-        name: "get_people_accounts",
-        description:
-          "Return a list of SaaS accounts belonging to a person. The peopleId can be obtained from the get_identities tool. Can be filtered by role, two-factor authentication, and searched by service name or workspace name",
-        inputSchema: zodToJsonSchema(PeopleAccountsFiltersSchema),
-      },
-      {
-        name: "get_identity_field_configuration",
-        description:
-          "Get identity field configuration of an organization. Returns preset field configurations, field order, available fields, fields metadata, and field details. Optionally pass an identityId to get the effective configuration for a specific identity.",
-        inputSchema: zodToJsonSchema(GetIdentityFieldConfigurationSchema),
-      },
-      {
-        name: "get_identity_config",
-        description:
-          "Get configuration for identity fields of a specific identity. Required to filter by a specific identityId to see the effective configuration for that identity.",
-        inputSchema: zodToJsonSchema(IdentityConfigFiltersSchema),
-      },
-      {
-        name: "get_identity_custom_fields",
-        description:
-          "Get all identity custom fields configured for an organization. Returns field definitions, types (text, date, number, dropdown), and configurations.",
-        inputSchema: zodToJsonSchema(IdentityCustomFieldsFiltersSchema),
-      },
-      {
-        name: "check_identity_management_type",
-        description:
-          "Check Identity management type. Use this endpoint to determine the management type for an identity based on email or identityId. Returns the management type (e.g., hr_master, manual, unregistered).",
-        inputSchema: zodToJsonSchema(CheckIdentityManagementTypeSchema),
-      },
-      {
-        name: "get_identities_stats",
-        description:
-          "Get identities statistics for an organization. Returns management type counts, HR master integration information, and domain lists. Use this to understand the distribution of identities across different management types and HR systems.",
-        inputSchema: zodToJsonSchema(GetIdentitiesStatsSchema),
-      },
-      {
-        name: "merge_identities",
-        description:
-          "Merge identities in batch. Use this to merge multiple people entities or identity entities. Supports up to 50 merge operations per request. Can merge people entities (by peopleId) or identity entities (by identityId) in a single operation.",
-        inputSchema: zodToJsonSchema(MergeIdentitiesSchema),
-      },
-      {
-        name: "unmerge_identities",
-        description:
-          "Unmerge previously merged identity/people entities. Provide peopleIds, identityIds, or both to unmerge (up to 50 items each).",
-        inputSchema: zodToJsonSchema(UnmergeIdentitiesSchema),
-      },
-      {
-        name: "bulk_update_identities",
-        description:
-          "Bulk update multiple identities in a single request. Provide a list of identity IDs (1-50) and a set of field updates to apply to all of them. All identity update fields are optional.",
-        inputSchema: zodToJsonSchema(BulkUpdateIdentitiesSchema),
-      },
-      {
-        name: "get_identity_history",
-        description:
-          "Get the change history of a specific identity. Returns a paginated list of history records showing field-level changes, action types, sources, and actors.",
-        inputSchema: zodToJsonSchema(GetIdentityHistorySchema),
-      },
-      {
-        name: "archive_identity",
-        description:
-          "Toggle the archive flag for an identity. Returns the updated identity with the new archive state.",
-        inputSchema: zodToJsonSchema(ArchiveIdentitySchema),
-      },
-      {
-        name: "unregister_identity",
-        description:
-          "Toggle the unregistered management type for an identity. Returns the updated identity with the new management type.",
-        inputSchema: zodToJsonSchema(UnregisterIdentitySchema),
-      },
-      {
-        name: "create_identity_custom_field",
-        description:
-          "Create a new identity custom field for an organization. Defines a new field that can be used across all identities in the organization.",
-        inputSchema: zodToJsonSchema(CreateIdentityCustomFieldSchema),
-      },
-      {
-        name: "update_identity_custom_field",
-        description: "Update an existing identity custom field configuration. Can modify field name and code.",
-        inputSchema: zodToJsonSchema(UpdateIdentityCustomFieldSchema),
-      },
-      {
-        name: "delete_identity_custom_field",
-        description:
-          "Delete an identity custom field for an organization. Removes a custom field definition from the organization.",
-        inputSchema: zodToJsonSchema(DeleteIdentityCustomFieldSchema),
-      },
-    ],
-  };
-});
-
-// Tool handler type definition
-type ToolHandler = (input: Record<string, unknown>) => Promise<unknown>;
-
-// Tool handlers map to reduce cognitive complexity
-const toolHandlers: Record<string, ToolHandler> = {
-  get_organization_info: async () => getOrganizationInfo(),
-  get_devices: async (input) => getDevices(DeviceFiltersSchema.parse(input)),
-  create_device: async (input) => createDevice(CreateDeviceSchema.parse(input)),
-  update_device: async (input) => updateDevice(UpdateDeviceSchema.parse(input)),
-  update_device_meta: async (input) => updateDeviceMeta(UpdateDeviceMetaSchema.parse(input)),
-  get_device_custom_fields: async () => getDeviceCustomFields(),
-  create_device_custom_field: async (input) => createDeviceCustomField(CreateDeviceCustomFieldSchema.parse(input)),
-  update_device_custom_field: async (input) => updateDeviceCustomField(UpdateDeviceCustomFieldSchema.parse(input)),
-  delete_device_custom_field: async (input) => deleteDeviceCustomField(DeleteDeviceCustomFieldSchema.parse(input)),
-  get_identities: async (input) => getIdentities(IdentityFiltersSchema.parse(input)),
-  create_identity: async (input) => createIdentity(CreateIdentitySchema.parse(input)),
-  get_identity: async (input) => getIdentity(GetIdentitySchema.parse(input)),
-  update_identity: async (input) => updateIdentity(UpdateIdentitySchema.parse(input)),
-  delete_identity: async (input) => deleteIdentity(DeleteIdentitySchema.parse(input)),
-  get_services: async (input) => getServices(ServiceFiltersSchema.parse(input)),
-  get_service_accounts: async (input) => getServiceAccounts(ServiceAccountFiltersSchema.parse(input)),
-  get_people_accounts: async (input) => getPeopleAccounts(PeopleAccountsFiltersSchema.parse(input)),
-  get_identity_field_configuration: async (input) =>
-    getIdentityFieldConfiguration(GetIdentityFieldConfigurationSchema.parse(input)),
-  get_identity_config: async (input) => getIdentityConfig(IdentityConfigFiltersSchema.parse(input)),
-  get_identity_custom_fields: async () => getIdentityCustomFields(),
-  check_identity_management_type: async (input) =>
-    checkIdentityManagementType(CheckIdentityManagementTypeSchema.parse(input)),
-  get_identities_stats: async (input) => getIdentitiesStats(GetIdentitiesStatsSchema.parse(input)),
-  merge_identities: async (input) => mergeIdentities(MergeIdentitiesSchema.parse(input)),
-  unmerge_identities: async (input) => unmergeIdentities(UnmergeIdentitiesSchema.parse(input)),
-  bulk_update_identities: async (input) => bulkUpdateIdentities(BulkUpdateIdentitiesSchema.parse(input)),
-  get_identity_history: async (input) => getIdentityHistory(GetIdentityHistorySchema.parse(input)),
-  archive_identity: async (input) => archiveIdentity(ArchiveIdentitySchema.parse(input)),
-  unregister_identity: async (input) => unregisterIdentity(UnregisterIdentitySchema.parse(input)),
-  create_identity_custom_field: async (input) =>
-    createIdentityCustomField(CreateIdentityCustomFieldSchema.parse(input)),
-  update_identity_custom_field: async (input) =>
-    updateIdentityCustomField(UpdateIdentityCustomFieldSchema.parse(input)),
-  delete_identity_custom_field: async (input) =>
-    deleteIdentityCustomField(DeleteIdentityCustomFieldSchema.parse(input)),
-};
-
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const toolName = request.params.name;
-  const input = request.params.arguments || {};
-  try {
-    const handler = toolHandlers[toolName];
-    if (!handler) {
-      return {
-        content: [{ type: "text", text: `Unknown tool: ${toolName}` }],
-        isError: true,
-      };
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+    if (arg === "--http") {
+      transport = "http";
+    } else if (arg === "--stdio") {
+      transport = "stdio";
+    } else if (arg === "--port") {
+      const next = argv[++i];
+      if (!next) throw new Error("--port requires a value");
+      const parsed = Number(next);
+      if (!Number.isFinite(parsed) || parsed < 0 || parsed > 65535) {
+        throw new Error(`Invalid --port value: ${next}`);
+      }
+      port = parsed;
+    } else if (arg === "--host") {
+      const next = argv[++i];
+      if (!next) throw new Error("--host requires a value");
+      host = next;
     }
-
-    const response = await handler(input);
-    return {
-      content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
-      isError: false,
-    };
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorDetails = error.errors
-        .map((err) => {
-          return `${err.path.join(".")}: ${err.message}`;
-        })
-        .join("\n");
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: `Invalid input:\n${errorDetails}`,
-          },
-        ],
-        isError: true,
-      };
-    }
-
-    if (isAdminaError(error)) {
-      return {
-        content: [{ type: "text", text: formatAdminaError(error) }],
-        isError: true,
-      };
-    }
-
-    return {
-      content: [
-        {
-          type: "text",
-          text: `Error: ${error instanceof Error ? error.message : String(error)}`,
-        },
-      ],
-      isError: true,
-    };
   }
-});
 
-// Start the server
-const serverTransport = new StdioServerTransport();
-server.connect(serverTransport);
+  if (!Number.isFinite(port) || port < 0 || port > 65535) {
+    throw new Error(`Invalid MCP_HTTP_PORT value: ${env.MCP_HTTP_PORT}`);
+  }
+
+  return {
+    transport,
+    http: { port, host },
+  };
+}
+
+async function main(): Promise<void> {
+  const opts = parseCliOptions(process.argv.slice(2), process.env);
+
+  if (opts.transport === "http") {
+    const handle = await runHttp(opts.http);
+    console.error(`[admina-mcp-server] listening on http://${handle.host}:${handle.port}/mcp`);
+    return;
+  }
+
+  await runStdio();
+}
+
+// Only run when invoked as the entry point; `parseCliOptions` is also exported for tests.
+// Jest sets JEST_WORKER_ID; skip auto-run in that case.
+if (!process.env.JEST_WORKER_ID) {
+  main().catch((err) => {
+    console.error("[admina-mcp-server] fatal:", err instanceof Error ? err.message : err);
+    process.exit(1);
+  });
+}
