@@ -1,13 +1,14 @@
 import { URLSearchParams } from "node:url";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 import { createAdminaError } from "./common/errors.js";
+import { getCurrentCredentials } from "./context.js";
 
 // Header sent on every request so the API can distinguish MCP (AI) calls from other clients for usage tracking
 export const MCP_USAGE_TRACKING_HEADERS = {
   "X-Request-Source": "mcp",
 } as const;
 
-function getConfig(): { apiKey: string; organizationId: string } {
+function getConfigFromEnv(): { apiKey: string; organizationId: string } {
   if (!process.env.ADMINA_API_KEY || !process.env.ADMINA_ORGANIZATION_ID) {
     throw new Error("ADMINA_API_KEY and ADMINA_ORGANIZATION_ID must be set");
   }
@@ -165,9 +166,24 @@ export class AdminaApiClient {
 
 let clientInstance: AdminaApiClient | null = null;
 
+/**
+ * Returns an AdminaApiClient for the current request.
+ *
+ * Resolution order:
+ *   1. If running inside a `withCredentials(...)` scope (remote HTTP mode),
+ *      returns a fresh client bound to those credentials. Never cached — two
+ *      concurrent HTTP requests with different tenants must see isolated clients.
+ *   2. Otherwise (stdio mode), returns a process-wide singleton built from
+ *      `ADMINA_API_KEY` + `ADMINA_ORGANIZATION_ID` env vars. Throws if unset.
+ */
 export function getClient(): AdminaApiClient {
+  const ctx = getCurrentCredentials();
+  if (ctx) {
+    return new AdminaApiClient(ctx.apiKey, ctx.organizationId);
+  }
+
   if (!clientInstance) {
-    const config = getConfig();
+    const config = getConfigFromEnv();
     clientInstance = new AdminaApiClient(config.apiKey, config.organizationId);
   }
 
@@ -175,7 +191,7 @@ export function getClient(): AdminaApiClient {
 }
 
 /**
- * Resets the client instance. Useful for testing or reconfiguration.
+ * Resets the env-backed singleton. Useful for tests.
  */
 export function resetClient(): void {
   clientInstance = null;

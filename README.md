@@ -46,8 +46,13 @@ MCP server for the Admina API.
 
 To configure the admina-mcp-server, you will need the `organizationId` and an API key. For more details on obtaining your API key, please refer to the [Getting Started Guide](https://docs.itmc.i.moneyforward.com/reference/getting-started-1#step-1-obtain-your-api-key).
 
-## MCP Client Configuration
-To configure this MCP server, add the following configuration to your mcp settings. 
+The server supports two transports:
+
+- **stdio** (default) — local subprocess, credentials from environment variables. Use this for Claude Desktop, Cursor, and similar clients.
+- **HTTP (Streamable HTTP)** — remote server, credentials per request via headers. Use this for hosted deployments and multi-tenant setups. See [docs/remote-mcp.md](docs/remote-mcp.md) for the full spec.
+
+## MCP Client Configuration (stdio)
+To run the server locally as a subprocess, add the following configuration to your MCP client settings:
 ```
 {
   "mcpServers": {
@@ -67,6 +72,37 @@ To configure this MCP server, add the following configuration to your mcp settin
 ```
 
 For local set up, run `yarn build:dev` and set the path to the root dir.
+
+## MCP Client Configuration (HTTP / Remote)
+
+Start the server in HTTP mode:
+
+```
+admina-mcp-server --http --port 3000
+```
+
+Defaults: bind `127.0.0.1:3000`, path `/mcp`. Override via `--host`, `--port`, or `MCP_HTTP_HOST` / `MCP_HTTP_PORT` env vars.
+
+In HTTP mode the server is stateless: credentials are supplied per request via HTTP headers (`Authorization: Bearer <API_KEY>` and `X-Admina-Organization-Id: <ORG_ID>`). A single instance can serve many tenants.
+
+Client configuration example (exact key names vary by client):
+
+```
+{
+  "mcpServers": {
+    "admina-remote": {
+      "type": "http",
+      "url": "https://your-deployment.example.com/mcp",
+      "headers": {
+        "Authorization": "Bearer <API Key>",
+        "X-Admina-Organization-Id": "<Organization Id>"
+      }
+    }
+  }
+}
+```
+
+See [docs/remote-mcp.md](docs/remote-mcp.md) for auth details, multi-tenant setup, security notes, and a curl smoke test.
 
 ## Releasing
 ### Preparing a release
