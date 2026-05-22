@@ -20,6 +20,8 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
+        env:
+          TAKUMI_GUARD_AUTH_TOKEN: ${{ secrets.TAKUMI_GUARD_AUTH_TOKEN }}
 
       - name: Build
         run: yarn build
