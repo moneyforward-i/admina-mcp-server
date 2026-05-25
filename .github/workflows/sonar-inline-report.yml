@@ -1,0 +1,23 @@
+name: SonarCloud Inline Report
+
+on:
+  check_run:
+    types: [completed]
+
+permissions: {}
+
+jobs:
+  report:
+    # Skip default-branch check_run completions that aren't associated with a PR;
+    # without this guard the runner would spin up only for the reusable workflow to skip.
+    if: |
+      github.event.check_run.app.slug == 'sonarqubecloud' &&
+      github.event.check_run.name == 'SonarCloud Code Analysis' &&
+      github.event.check_run.pull_requests[0] != null
+    permissions:
+      pull-requests: write
+      contents: write   # GitHub requires contents:write to call resolveReviewThread (see community #44650)
+      checks: read      # parse-time validation requires this because the reusable declares it
+    uses: moneyforward-i/actions/.github/workflows/reusable-sonarcloud-inline-report.yaml@main
+    secrets:
+      SONAR_CLOUD_USER_TOKEN: ${{ secrets.SONAR_CLOUD_USER_TOKEN }}
