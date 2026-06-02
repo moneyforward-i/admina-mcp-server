@@ -10,9 +10,17 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # required for Takumi Guard OIDC
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup Takumi Guard npm registry
+        uses: flatt-security/setup-takumi-guard-npm@9a5d797c2085b6326d3a2985c08e3a114b9b88c1 #v1.1.1
+        with:
+          bot-id: "BT01KSPTTXMY1DBFSFFSHVGJT8KA"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,6 +37,21 @@ jobs:
 
       - name: Test
         run: yarn test
+
+      - name: Reset registry to npmjs for publish
+        run: |
+          # Install/build/test above run through Takumi Guard. CI uses yarn
+          # classic, which honors the project-level .npmrc the Takumi action
+          # wrote (registry=https://npm.flatt.tech/ + auth token). Strip those
+          # lines so `yarn publish` targets the public npm registry instead.
+          if [ -f .npmrc ]; then
+            grep -v 'flatt\.tech' .npmrc > .npmrc.tmp || true
+            mv .npmrc.tmp .npmrc
+          fi
+          # Defensive: neutralize the yarn-berry registry env vars too, so a
+          # future migration to yarn berry does not silently redirect publish.
+          echo "YARN_NPM_REGISTRY_SERVER=" >> "$GITHUB_ENV"
+          echo "YARN_NPM_AUTH_TOKEN=" >> "$GITHUB_ENV"
 
       - name: Publish
         run: yarn publish
