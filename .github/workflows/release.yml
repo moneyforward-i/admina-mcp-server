@@ -29,6 +29,9 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           scope: "@moneyforward_i"
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Install dependencies
         run: yarn install
 
