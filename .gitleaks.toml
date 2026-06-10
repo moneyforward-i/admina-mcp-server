@@ -1,0 +1,92 @@
+title = "moneyforward-i sensitive-data baseline"
+
+# Org-wide gitleaks baseline for moneyforward-i repositories.
+# Extends the stock gitleaks rules (secrets: API keys, tokens, private
+# keys, ...) with PII rules: client/employee email addresses must never
+# be committed as code.
+#
+# Repo-local copy of the org baseline, used by both CI (the
+# reusable-sensitive-data-scan workflow prefers this file) and the local
+# pre-commit hook. Canonical source: moneyforward-i/actions
+#   .github/workflows/reusable-sensitive-data-scan/config/gitleaks-org.toml
+# Add repo-specific allowlists at the bottom of this file; do not weaken
+# the org rules.
+
+[extend]
+useDefault = true
+
+# -------------------------------------------------------------------
+# Money Forward internal / employee email addresses
+# -------------------------------------------------------------------
+[[rules]]
+id = "moneyforward-email-address"
+description = "Money Forward internal email address committed as code"
+regex = '''(?i)\b[a-z0-9._%+-]+@(?:i\.)?moneyforward(?:-dev)?\.(?:com|co\.jp|vn)\b'''
+tags = ["pii", "email", "internal"]
+
+  [[rules.allowlists]]
+  description = "Public role addresses are not PII"
+  regexTarget = "match"
+  regexes = ['''(?i)\b(?:support|info|noreply|no-reply|contact|sales|press|privacy|security|legal)@''']
+
+# -------------------------------------------------------------------
+# Any other real-looking email address (catches client/customer PII)
+# -------------------------------------------------------------------
+[[rules]]
+id = "generic-email-address"
+description = "Email address on a non-placeholder domain (possible client/employee PII)"
+regex = '''(?i)\b[a-z][a-z0-9._%+-]*@[a-z0-9][a-z0-9.-]*\.[a-z]{2,}\b'''
+tags = ["pii", "email"]
+
+  [[rules.allowlists]]
+  description = "RFC 2606 / RFC 6761 reserved and conventional placeholder domains"
+  regexTarget = "match"
+  regexes = [
+    '''(?i)@(?:[a-z0-9.-]+\.)?example\.(?:com|org|net|jp|co\.jp)\b''',
+    '''(?i)@(?:[a-z0-9.-]+\.)?(?:example|test|invalid|localhost|local)\b''',
+    '''(?i)@(?:test|testing|sample|dummy|placeholder|fake|mail|email|domain|company|acme|acme-corp|admina)\.(?:com|org|net|io|jp|co\.jp|test)\b''',
+    '''(?i)@[a-z0-9.-]*test[a-z0-9-]*\.(?:com|org|net|io|jp|co\.jp)\b''',
+    '''(?i)@(?:foo|bar|baz|qux|hoge|fuga|piyo|abc|xyz)\.[a-z.]{2,}\b''',
+    '''(?i)@[a-z]\.(?:com|org|net|io|jp|co\.jp)\b''',
+    '''(?i)@[\w.-]+\.(?:png|jpe?g|gif|svg|webp|md|ts|tsx|js|json|ya?ml)\b''',
+    '''(?i)@users\.noreply\.github\.com\b''',
+    '''(?i)\b(?:noreply|no-reply|donotreply|support|info|contact|sales|press|privacy|security|legal)@''',
+    '''@\d''',
+    '''(?i)@[a-z0-9-]+(?:\.[a-z0-9-]+)*\.i\.moneyforward\.com\b''',
+    '''(?i)@admina\.moneyforward\.com\b''',
+  ]
+
+  [[rules.allowlists]]
+  description = "Dependency metadata and generated artifacts (OSS author emails etc.)"
+  paths = [
+    '''(?:^|/)node_modules/''',
+    '''(?:^|/)\.yarn/''',
+    '''yarn\.lock$''',
+    '''package-lock\.json$''',
+    '''pnpm-lock\.yaml$''',
+    '''Gemfile\.lock$''',
+    '''go\.sum$''',
+    '''(?:^|/)LICENSE(?:\.[a-z]+)?$''',
+  ]
+
+# -------------------------------------------------------------------
+# Global allowlist
+# -------------------------------------------------------------------
+[[allowlists]]
+description = "Vendored, generated, and lock content never reviewed by hand; scanner's own config/docs (contain detection examples)"
+paths = [
+  '''(?:^|/)node_modules/''',
+  '''(?:^|/)\.yarn/(?:cache|releases|plugins)/''',
+  '''(?:^|/)dist/''',
+  '''(?:^|/)\.next/''',
+  '''(?:^|/)docs/security/[^/]*triage[^/]*\.md$''',
+  '''(?:^|/)\.gitleaks\.toml$''',
+  '''(?:^|/)\.gitleaksignore$''',
+  '''(?:^|/)\.github/workflows/reusable-sensitive-data-scan/''',
+  '''\.(?:png|jpe?g|gif|ico|webp|woff2?|ttf|eot|pdf|zip|gz)$''',
+]
+
+# ---------------------------------------------------------------------------
+# Repo-specific allowlists (add entries below; prefer .gitleaksignore for
+# one-off false positives)
+# ---------------------------------------------------------------------------
