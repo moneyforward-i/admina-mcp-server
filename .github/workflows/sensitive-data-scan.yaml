@@ -1,0 +1,89 @@
+name: Sensitive Data Scan
+
+# Org-wide sensitive-data scanning (gitleaks): secrets (API keys, tokens,
+# private keys, ...) plus client/employee email-address PII.
+#
+# NOTE: most moneyforward-i repos call the reusable workflow
+#   moneyforward-i/actions/.github/workflows/reusable-sensitive-data-scan.yaml
+# but this repository is PUBLIC and moneyforward-i/actions is internal, so
+# GitHub forbids the reusable call here. This standalone job replicates the
+# reusable workflow (same gitleaks version, config resolution, and scan mode).
+# Keep it in sync when the canonical reusable workflow changes.
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # to check out the repository (full history for commit-range scans)
+    env:
+      GITLEAKS_VERSION: "8.30.1"
+      GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+    steps:
+      - name: Check out repository (full history)
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks
+        run: |
+          set -euo pipefail
+          curl -sSfL --retry 3 -o "$RUNNER_TEMP/gitleaks.tar.gz" \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  $RUNNER_TEMP/gitleaks.tar.gz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/gitleaks-bin"
+          tar -xzf "$RUNNER_TEMP/gitleaks.tar.gz" -C "$RUNNER_TEMP/gitleaks-bin" gitleaks
+          echo "$RUNNER_TEMP/gitleaks-bin" >> "$GITHUB_PATH"
+
+      - name: Run gitleaks
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPORT_PATH: ${{ runner.temp }}/gitleaks-report.json
+        run: |
+          set -euo pipefail
+          common_args=(--config .gitleaks.toml --redact --no-banner --exit-code 1
+                       --report-format json --report-path "$REPORT_PATH" --verbose)
+          if [ -n "$PR_BASE_SHA" ] && [ -n "$PR_HEAD_SHA" ]; then
+            echo "Scanning commit range $PR_BASE_SHA..$PR_HEAD_SHA"
+            gitleaks git --log-opts="--no-merges $PR_BASE_SHA..$PR_HEAD_SHA" "${common_args[@]}" .
+          else
+            echo "No commit range available; scanning the full working tree"
+            gitleaks dir . "${common_args[@]}"
+          fi
+
+      - name: Write step summary
+        if: always()
+        env:
+          REPORT_PATH: ${{ runner.temp }}/gitleaks-report.json
+        run: |
+          set -euo pipefail
+          {
+            echo "## Sensitive Data Scan"
+            if [ ! -f "$REPORT_PATH" ]; then
+              echo "Scan did not produce a report (setup failure)."
+            elif [ "$(jq 'length' "$REPORT_PATH")" -eq 0 ]; then
+              echo "No sensitive data found. :white_check_mark:"
+            else
+              echo "**$(jq 'length' "$REPORT_PATH") finding(s).** Real client/employee data must be removed and the secret rotated; placeholder data should use \`example.com\` / \`.test\` domains."
+              echo
+              echo "| Rule | File | Line | Description |"
+              echo "|---|---|---|---|"
+              jq -r '.[] | "| \(.RuleID) | \(.File) | \(.StartLine) | \(.Description) |"' "$REPORT_PATH"
+              echo
+              echo "False positive? Add its fingerprint to \`.gitleaksignore\`, or extend the allowlist in the repo's \`.gitleaks.toml\`."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: gitleaks-report
+          path: ${{ runner.temp }}/gitleaks-report.json
+          if-no-files-found: ignore
+          retention-days: 7
